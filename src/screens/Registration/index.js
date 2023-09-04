@@ -9,11 +9,13 @@ import {
   Alert,
   StatusBar,
   SafeAreaView,
-  Platform
+  Platform,
+  ScrollView
 } from "react-native";
 import styles from "./styles";
 import { BaseColor } from "@config";
 import { HomeHeader, Header, CustomStatusBar } from "@components";
+import Icon from "react-native-vector-icons/AntDesign";
 // import { useSelector } from "react-redux";
 
 const Registration = ({ navigation }) => {
@@ -38,8 +40,14 @@ const Registration = ({ navigation }) => {
         onPressLeft={() => {
           navigation.goBack();
         }}
+        onPressRight={() => {
+          navigation.goBack();
+        }}
+        renderRight={() => {
+          return <Text style={{ fontSize: 15, color: "white" }}>Submit</Text>;
+        }}
       />
-      <View style={{}}>
+      <ScrollView style={{}}>
         <View style={styles.subContainer}>
           <Text style={styles.subTitlesText}>Email Address</Text>
           <TextInput
@@ -53,30 +61,60 @@ const Registration = ({ navigation }) => {
             secureTextEntry={true}
             style={styles.subTitlesTextInput}
           />
+          <Text style={styles.subTitlesText}>Repeat Password</Text>
+          <TextInput
+            onChangeText={(text) => setParams({ ...params, pwd: text })}
+            secureTextEntry={true}
+            style={styles.subTitlesTextInput}
+          />
+          <Text style={styles.subTitlesText}>Handphone Number</Text>
+          <TextInput
+            onChangeText={(text) => setParams({ ...params, email: text })}
+            style={styles.subTitlesTextInput}
+            keyboardType={"number-pad"}
+          />
+          <Text style={styles.subTitlesText}>Office Number</Text>
+          <TextInput
+            onChangeText={(text) => setParams({ ...params, email: text })}
+            style={styles.subTitlesTextInput}
+            keyboardType={"number-pad"}
+          />
+          <Text style={styles.subTitlesText}>Director Name</Text>
+          <TextInput
+            onChangeText={(text) => setParams({ ...params, email: text })}
+            style={styles.subTitlesTextInput}
+          />
+          <Text style={styles.subTitlesText}>IC No</Text>
+          <TextInput
+            onChangeText={(text) => setParams({ ...params, email: text })}
+            style={styles.subTitlesTextInput}
+            keyboardType={"number-pad"}
+          />
+          <Text style={styles.subTitlesText}>Company Name</Text>
+          <TextInput
+            onChangeText={(text) => setParams({ ...params, email: text })}
+            style={styles.subTitlesTextInput}
+            keyboardType={"email-address"}
+          />
+          <Text style={styles.subTitlesText}>SSM No</Text>
+          <TextInput
+            onChangeText={(text) => setParams({ ...params, email: text })}
+            style={styles.subTitlesTextInput}
+          />
+          <Text style={styles.subTitlesText}>IC Image</Text>
+          <View style={styles.uploadButtonContainer}>
+            <TouchableOpacity style={styles.uploadButtonSub} onPress={() => {}}>
+              <Text style={{ color: "white" }}>Upload</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.subTitlesText}>Company Logo</Text>
+          <View style={[styles.uploadButtonContainer, { marginBottom: 20 }]}>
+            <TouchableOpacity style={styles.uploadButtonSub} onPress={() => {}}>
+              <Text style={{ color: "white" }}>Upload</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <TouchableOpacity
-          onPress={() => {
-            if ((params.email == "", params.pwd == "")) {
-              Alert.alert("Sorry", "All fields are required");
-            } else {
-              // dispatch(AuthAction.authentication(params)).then((res) => {
-              //   if (res) {
-              //     console.log("Ggtry me", res);
-              //     navigation.navigate("Home");
-              //   } else {
-              //     Alert.alert("Sorry", "Authentication Error");
-              //   }
-              // });
-            }
-          }}
-          style={[
-            styles.buttonContainer,
-            { backgroundColor: BaseColor.primaryColor }
-          ]}
-        >
-          <Text style={styles.buttonText}>Register</Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </View>
   );
 };

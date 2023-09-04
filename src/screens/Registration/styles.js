@@ -1,4 +1,5 @@
 import { StyleSheet, Platform, StatusBar } from "react-native";
+import { BaseColor } from "@config";
 
 export default StyleSheet.create({
   mainContainer: { flex: 1 },
@@ -76,5 +77,24 @@ export default StyleSheet.create({
     alignSelf: "center",
     fontWeight: "bold",
     color: "white"
+  },
+  uploadButtonContainer: {
+    width: "100%",
+    height: 160,
+    backgroundColor: "grey",
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  uploadButtonSub: {
+    backgroundColor: BaseColor.primaryColor,
+    height: 40,
+    padding: 5,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 5,
+    borderColor: BaseColor.darkPrimaryColor,
+    borderWidth: 2,
+    width: 80
   }
 });
