@@ -34,7 +34,7 @@ const Login = ({ navigation }) => {
               justifyContent: "center"
             }}
           >
-            <Text style={styles.title}>Nevoop</Text>
+            <Text style={styles.title}>NEVOOP</Text>
             <Text style={styles.subTitle}>Merchant</Text>
           </View>
         </View>
@@ -71,6 +71,24 @@ const Login = ({ navigation }) => {
             style={styles.buttonContainer}
           >
             <Text style={styles.buttonText}>LOGIN</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              alignSelf: "center",
+              top: 20
+            }}
+            onPress={() => {
+              navigation.navigate("Registration");
+            }}
+          >
+            <Text
+              style={{
+                color: "#138D75",
+                fontSize: 16
+              }}
+            >
+              Register
+            </Text>
           </TouchableOpacity>
         </View>
       </ImageBackground>
