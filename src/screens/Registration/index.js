@@ -10,17 +10,63 @@ import {
   StatusBar,
   SafeAreaView,
   Platform,
-  ScrollView
+  ScrollView,
+  Modal,
+  Pressable
 } from "react-native";
 import styles from "./styles";
 import { BaseColor } from "@config";
-import { HomeHeader, Header, CustomStatusBar } from "@components";
+import { HomeHeader, Header, CustomStatusBar, CustomModal } from "@components";
 import Icon from "react-native-vector-icons/AntDesign";
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 // import { useSelector } from "react-redux";
 
 const Registration = ({ navigation }) => {
   // const authUser = useSelector((state) => state.auth);
   const [params, setParams] = useState({ email: "", pwd: "" });
+  const [showImageModal, setShowImageModal] = useState(false);
+
+  const handleFileUpload = async (imgName, imgBase64) => {
+    // const file = imgURI.target.files[0];
+    // console.log(imgBase64.assets[0]?.base64);
+    var stringLength =
+      imgBase64.assets[0]?.base64.length - "data:image/png;base64,".length;
+    var sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.5624896334383812;
+    var sizeInMb = sizeInBytes / 1048576;
+    console.log(sizeInMb);
+    if (sizeInMb > 5) {
+      console.log("more then 10mb");
+      // imageRef.current.value = "";
+      // setShowImgSizeAlert(true);
+      // let timerShowQRFail = setTimeout(() => {
+      //   setShowImgSizeAlert(false);
+      // }, 4000);
+    }
+    // Services.storeBlobGetURL({ file: res }).then((res) => {
+    //   if (imgName == "icImage") {
+    //     setFormParams({ ...formParams, icImg: res.urlLink });
+    //   } else if (imgName == "logoImg") {
+    //     icRef.current.value = "";
+    //     logoRef.current.value = "";
+    //     setFormParams({ ...formParams, logoImg: res.urlLink });
+    //   }
+    // });
+  };
+
+  const imageEmptyView = () => {
+    return (
+      <View style={styles.uploadButtonContainer}>
+        <TouchableOpacity
+          style={styles.uploadButtonSub}
+          onPress={() => {
+            setShowImageModal(true);
+          }}
+        >
+          <Text style={{ color: "white" }}>Upload</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.mainContainer}>
@@ -35,7 +81,7 @@ const Registration = ({ navigation }) => {
         }}
         title={"Registration"}
         renderLeft={() => {
-          return <Text style={{ fontSize: 16, color: "white" }}>Back</Text>;
+          return <Text style={{ fontSize: 15, color: "white" }}>Back</Text>;
         }}
         onPressLeft={() => {
           navigation.goBack();
@@ -44,7 +90,11 @@ const Registration = ({ navigation }) => {
           navigation.goBack();
         }}
         renderRight={() => {
-          return <Text style={{ fontSize: 15, color: "white" }}>Submit</Text>;
+          return (
+            <Text style={{ fontSize: 15, color: "white", right: 10 }}>
+              Submit
+            </Text>
+          );
         }}
       />
       <ScrollView style={{}}>
@@ -102,18 +152,54 @@ const Registration = ({ navigation }) => {
             style={styles.subTitlesTextInput}
           />
           <Text style={styles.subTitlesText}>IC Image</Text>
-          <View style={styles.uploadButtonContainer}>
-            <TouchableOpacity style={styles.uploadButtonSub} onPress={() => {}}>
-              <Text style={{ color: "white" }}>Upload</Text>
-            </TouchableOpacity>
-          </View>
+          {imageEmptyView()}
           <Text style={styles.subTitlesText}>Company Logo</Text>
-          <View style={[styles.uploadButtonContainer, { marginBottom: 20 }]}>
-            <TouchableOpacity style={styles.uploadButtonSub} onPress={() => {}}>
-              <Text style={{ color: "white" }}>Upload</Text>
+          {imageEmptyView()}
+        </View>
+        {/* {uploadImageModal()} */}
+        <CustomModal
+          title={"Upload"}
+          buttonText={"Ok"}
+          buttonOnPress={() => {
+            setShowImageModal(false);
+          }}
+          cancelOnPress={() => {
+            setShowImageModal(false);
+          }}
+          subTitle={"Image"}
+          show={showImageModal}
+        >
+          <View
+            style={{
+              marginTop: 20
+            }}
+          >
+            <TouchableOpacity
+              style={[styles.modalButton]}
+              onPress={() => {
+                launchImageLibrary(
+                  { includeBase64: true, mediaType: "photo" },
+                  (res) => {
+                    // console.log(res);
+                    handleFileUpload("icImage", res);
+                  }
+                );
+              }}
+            >
+              <Text style={{ color: "white", fontSize: 18 }}>Open Gallery</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.modalButton, { marginTop: 10 }]}
+              onPress={() => {
+                launchCamera({ includeBase64: true, mediaType: "photo" });
+              }}
+            >
+              <Text style={{ color: "white", fontSize: 18 }}>
+                Capture Image
+              </Text>
             </TouchableOpacity>
           </View>
-        </View>
+        </CustomModal>
       </ScrollView>
     </View>
   );

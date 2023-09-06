@@ -96,5 +96,13 @@ export default StyleSheet.create({
     borderColor: BaseColor.darkPrimaryColor,
     borderWidth: 2,
     width: 80
+  },
+  modalButton: {
+    backgroundColor: BaseColor.primaryColor,
+    width: "100%",
+    height: 40,
+    borderRadius: 40,
+    alignItems: "center",
+    justifyContent: "center"
   }
 });
