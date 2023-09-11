@@ -19,38 +19,48 @@ import { BaseColor } from "@config";
 import { HomeHeader, Header, CustomStatusBar, CustomModal } from "@components";
 import Icon from "react-native-vector-icons/AntDesign";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import * as Services from "@services";
 // import { useSelector } from "react-redux";
 
 const Registration = ({ navigation }) => {
   // const authUser = useSelector((state) => state.auth);
   const [params, setParams] = useState({ email: "", pwd: "" });
   const [showImageModal, setShowImageModal] = useState(false);
+  const [showImgSizeAlert, setShowImgSizeAlert] = useState(false);
 
   const handleFileUpload = async (imgName, imgBase64) => {
     // const file = imgURI.target.files[0];
-    // console.log(imgBase64.assets[0]?.base64);
-    var stringLength =
-      imgBase64.assets[0]?.base64.length - "data:image/png;base64,".length;
+    // console.log("handleFileUploadxx", imgBase64.assets[0]);
+    let newImageBase64 = "";
+    var stringLength = imgBase64.assets[0]?.base64.length;
     var sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.5624896334383812;
     var sizeInMb = sizeInBytes / 1048576;
-    console.log(sizeInMb);
+    newImageBase64 =
+      "data:" +
+      imgBase64.assets[0].type +
+      ";" +
+      "base64," +
+      imgBase64.assets[0]?.base64;
+    console.log("sizeInMb", imgBase64.assets[0].type);
     if (sizeInMb > 5) {
       console.log("more then 10mb");
-      // imageRef.current.value = "";
-      // setShowImgSizeAlert(true);
-      // let timerShowQRFail = setTimeout(() => {
-      //   setShowImgSizeAlert(false);
-      // }, 4000);
+      imageRef.current.value = "";
+      setShowImgSizeAlert(true);
+      let timerShowQRFail = setTimeout(() => {
+        setShowImgSizeAlert(false);
+      }, 4000);
+      return;
     }
-    // Services.storeBlobGetURL({ file: res }).then((res) => {
-    //   if (imgName == "icImage") {
-    //     setFormParams({ ...formParams, icImg: res.urlLink });
-    //   } else if (imgName == "logoImg") {
-    //     icRef.current.value = "";
-    //     logoRef.current.value = "";
-    //     setFormParams({ ...formParams, logoImg: res.urlLink });
-    //   }
-    // });
+    Services.storeBlobGetURL({ file: newImageBase64 }).then((res) => {
+      console.log(res.urlLink);
+      // if (imgName == "icImage") {
+      //   setFormParams({ ...formParams, icImg: res.urlLink });
+      // } else if (imgName == "logoImg") {
+      //   icRef.current.value = "";
+      //   logoRef.current.value = "";
+      //   setFormParams({ ...formParams, logoImg: res.urlLink });
+      // }
+    });
   };
 
   const imageEmptyView = () => {
@@ -178,10 +188,25 @@ const Registration = ({ navigation }) => {
               style={[styles.modalButton]}
               onPress={() => {
                 launchImageLibrary(
-                  { includeBase64: true, mediaType: "photo" },
+                  {
+                    includeBase64: true,
+                    mediaType: "photo",
+                    quality: 0.5,
+                    maxWidth: 1000,
+                    maxHeight: 1000
+                  },
                   (res) => {
+                    if (res.didCancel) {
+                      console.log("canceled");
+                    } else if (res.error) {
+                      console.log("err");
+                    } else if (res.customButton) {
+                      console.log("cstm btn");
+                    } else {
+                      setShowImageModal(false);
+                      handleFileUpload("icImage", res);
+                    }
                     // console.log(res);
-                    handleFileUpload("icImage", res);
                   }
                 );
               }}
@@ -198,6 +223,29 @@ const Registration = ({ navigation }) => {
                 Capture Image
               </Text>
             </TouchableOpacity>
+          </View>
+        </CustomModal>
+
+        <CustomModal
+          title={"Error"}
+          buttonText={"Ok"}
+          buttonOnPress={() => {
+            setShowImageModal(false);
+          }}
+          cancelOnPress={() => {
+            setShowImageModal(false);
+          }}
+          subTitle={"Image Size"}
+          show={showImgSizeAlert}
+        >
+          <View
+            style={{
+              marginTop: 20
+            }}
+          >
+            <Text style={{ color: BaseColor.greyColor, fontSize: 18 }}>
+              Image must be less than 5 Mb
+            </Text>
           </View>
         </CustomModal>
       </ScrollView>
