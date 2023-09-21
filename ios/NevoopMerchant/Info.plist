@@ -7,10 +7,10 @@
 	<key>CFBundleDisplayName</key>
 	<string>NevoopMerchant</string>
 	<key>CFBundleExecutable</key>
-	<string>Select image/video from photos</string>
+	<!-- <string>Select image/video from photos</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Capture Image/Capture Video </string>
-	<key>NSCameraUsageDescription</key>
+	<key>NSCameraUsageDescription</key> -->
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>

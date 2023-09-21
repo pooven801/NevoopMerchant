@@ -1,36 +1,54 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
   Image,
-  ImageBackground,
   TouchableOpacity,
   TextInput,
-  Alert,
-  StatusBar,
-  SafeAreaView,
   Platform,
-  ScrollView,
-  Modal,
-  Pressable
+  ScrollView
 } from "react-native";
 import styles from "./styles";
-import { BaseColor } from "@config";
-import { HomeHeader, Header, CustomStatusBar, CustomModal } from "@components";
-import Icon from "react-native-vector-icons/AntDesign";
+import { BaseColor, Images } from "@config";
+import { Header, CustomStatusBar, CustomModal } from "@components";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import * as Services from "@services";
-// import { useSelector } from "react-redux";
 
 const Registration = ({ navigation }) => {
-  // const authUser = useSelector((state) => state.auth);
-  const [params, setParams] = useState({ email: "", pwd: "" });
+  const [params, setParams] = useState({
+    email: "",
+    password: "",
+    icImg: "",
+    logoImg: ""
+  });
   const [showImageModal, setShowImageModal] = useState(false);
   const [showImgSizeAlert, setShowImgSizeAlert] = useState(false);
+  const [showSummitFail, setShowSummitFail] = useState({
+    show: false,
+    message: ""
+  });
+  const [showSummitSuccess, setShowSummitSuccess] = useState(false);
+  const [currentImageSelectionType, setCurrentImageSelectionType] =
+    useState("");
+
+  const callRegisterMerchant = () => {
+    if (params?.password !== params?.pwd) {
+      setShowSummitFail({
+        show: true,
+        message: "Password is not matching with repeat password"
+      });
+      return;
+    }
+    Services.createMerchant(params).then((res) => {
+      if (res?.success == false) {
+        setShowSummitFail({ show: true, message: res?.message });
+      } else {
+        setShowSummitSuccess(true);
+      }
+    });
+  };
 
   const handleFileUpload = async (imgName, imgBase64) => {
-    // const file = imgURI.target.files[0];
-    // console.log("handleFileUploadxx", imgBase64.assets[0]);
     let newImageBase64 = "";
     var stringLength = imgBase64.assets[0]?.base64.length;
     var sizeInBytes = 4 * Math.ceil(stringLength / 3) * 0.5624896334383812;
@@ -41,10 +59,7 @@ const Registration = ({ navigation }) => {
       ";" +
       "base64," +
       imgBase64.assets[0]?.base64;
-    console.log("sizeInMb", imgBase64.assets[0].type);
     if (sizeInMb > 5) {
-      console.log("more then 10mb");
-      imageRef.current.value = "";
       setShowImgSizeAlert(true);
       let timerShowQRFail = setTimeout(() => {
         setShowImgSizeAlert(false);
@@ -52,24 +67,24 @@ const Registration = ({ navigation }) => {
       return;
     }
     Services.storeBlobGetURL({ file: newImageBase64 }).then((res) => {
-      console.log(res.urlLink);
-      // if (imgName == "icImage") {
-      //   setFormParams({ ...formParams, icImg: res.urlLink });
-      // } else if (imgName == "logoImg") {
-      //   icRef.current.value = "";
-      //   logoRef.current.value = "";
-      //   setFormParams({ ...formParams, logoImg: res.urlLink });
-      // }
+      if (currentImageSelectionType == "icImage") {
+        setParams({ ...params, icImg: res.urlLink });
+        setCurrentImageSelectionType("");
+      } else if (currentImageSelectionType == "logoImg") {
+        setParams({ ...params, logoImg: res.urlLink });
+        setCurrentImageSelectionType("");
+      }
     });
   };
 
-  const imageEmptyView = () => {
+  const imageEmptyView = (param) => {
     return (
-      <View style={styles.uploadButtonContainer}>
+      <View style={[styles.uploadButtonContainer]}>
         <TouchableOpacity
           style={styles.uploadButtonSub}
           onPress={() => {
             setShowImageModal(true);
+            setCurrentImageSelectionType(param.imageType);
           }}
         >
           <Text style={{ color: "white" }}>Upload</Text>
@@ -91,17 +106,31 @@ const Registration = ({ navigation }) => {
         }}
         title={"Registration"}
         renderLeft={() => {
-          return <Text style={{ fontSize: 15, color: "white" }}>Back</Text>;
+          return (
+            <Text
+              style={[
+                styles.headerButtonStyle,
+                Platform.OS === "ios" && { fontSize: 14 }
+              ]}
+            >
+              Back
+            </Text>
+          );
         }}
         onPressLeft={() => {
           navigation.goBack();
         }}
         onPressRight={() => {
-          navigation.goBack();
+          callRegisterMerchant();
         }}
         renderRight={() => {
           return (
-            <Text style={{ fontSize: 15, color: "white", right: 10 }}>
+            <Text
+              style={[
+                styles.headerButtonStyle,
+                Platform.OS === "ios" && { fontSize: 14 }
+              ]}
+            >
               Submit
             </Text>
           );
@@ -117,7 +146,7 @@ const Registration = ({ navigation }) => {
           />
           <Text style={styles.subTitlesText}>Password</Text>
           <TextInput
-            onChangeText={(text) => setParams({ ...params, pwd: text })}
+            onChangeText={(text) => setParams({ ...params, password: text })}
             secureTextEntry={true}
             style={styles.subTitlesTextInput}
           />
@@ -129,44 +158,79 @@ const Registration = ({ navigation }) => {
           />
           <Text style={styles.subTitlesText}>Handphone Number</Text>
           <TextInput
-            onChangeText={(text) => setParams({ ...params, email: text })}
+            onChangeText={(text) => setParams({ ...params, handphoneNo: text })}
             style={styles.subTitlesTextInput}
             keyboardType={"number-pad"}
           />
           <Text style={styles.subTitlesText}>Office Number</Text>
           <TextInput
-            onChangeText={(text) => setParams({ ...params, email: text })}
+            onChangeText={(text) => setParams({ ...params, officeNo: text })}
             style={styles.subTitlesTextInput}
             keyboardType={"number-pad"}
           />
           <Text style={styles.subTitlesText}>Director Name</Text>
           <TextInput
-            onChangeText={(text) => setParams({ ...params, email: text })}
+            onChangeText={(text) =>
+              setParams({ ...params, directorName: text })
+            }
             style={styles.subTitlesTextInput}
           />
           <Text style={styles.subTitlesText}>IC No</Text>
           <TextInput
-            onChangeText={(text) => setParams({ ...params, email: text })}
+            onChangeText={(text) => setParams({ ...params, icno: text })}
             style={styles.subTitlesTextInput}
             keyboardType={"number-pad"}
           />
           <Text style={styles.subTitlesText}>Company Name</Text>
           <TextInput
-            onChangeText={(text) => setParams({ ...params, email: text })}
+            onChangeText={(text) => setParams({ ...params, companyName: text })}
             style={styles.subTitlesTextInput}
-            keyboardType={"email-address"}
           />
           <Text style={styles.subTitlesText}>SSM No</Text>
           <TextInput
-            onChangeText={(text) => setParams({ ...params, email: text })}
+            onChangeText={(text) => setParams({ ...params, ssmno: text })}
             style={styles.subTitlesTextInput}
+            keyboardType={"number-pad"}
           />
           <Text style={styles.subTitlesText}>IC Image</Text>
-          {imageEmptyView()}
+          {params?.icImg == "" ? (
+            imageEmptyView({ bottomMargin: false, imageType: "icImage" })
+          ) : (
+            <View>
+              <Image src={params.icImg} style={styles.imageContainer} />
+              <TouchableOpacity
+                style={styles.cancelButtonContainer}
+                onPress={() => {
+                  setParams({ ...params, icImg: "" });
+                }}
+              >
+                <Image
+                  source={Images.icons.cancelRoundRed}
+                  style={{ width: 40, height: 40 }}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
           <Text style={styles.subTitlesText}>Company Logo</Text>
-          {imageEmptyView()}
+          {params?.logoImg == "" ? (
+            imageEmptyView({ bottomMargin: true, imageType: "logoImg" })
+          ) : (
+            <View>
+              <Image src={params.logoImg} style={styles.imageContainer} />
+              <TouchableOpacity
+                style={styles.cancelButtonContainer}
+                onPress={() => {
+                  setParams({ ...params, logoImg: "" });
+                }}
+              >
+                <Image
+                  source={Images.icons.cancelRoundRed}
+                  style={{ width: 40, height: 40 }}
+                />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-        {/* {uploadImageModal()} */}
         <CustomModal
           title={"Upload"}
           buttonText={"Ok"}
@@ -206,7 +270,6 @@ const Registration = ({ navigation }) => {
                       setShowImageModal(false);
                       handleFileUpload("icImage", res);
                     }
-                    // console.log(res);
                   }
                 );
               }}
@@ -216,7 +279,20 @@ const Registration = ({ navigation }) => {
             <TouchableOpacity
               style={[styles.modalButton, { marginTop: 10 }]}
               onPress={() => {
-                launchCamera({ includeBase64: true, mediaType: "photo" });
+                launchCamera({ includeBase64: true, mediaType: "photo" }).then(
+                  (res) => {
+                    if (res.didCancel) {
+                      console.log("canceled");
+                    } else if (res.error) {
+                      console.log("err");
+                    } else if (res.customButton) {
+                      console.log("cstm btn");
+                    } else {
+                      setShowImageModal(false);
+                      handleFileUpload("icImage", res);
+                    }
+                  }
+                );
               }}
             >
               <Text style={{ color: "white", fontSize: 18 }}>
@@ -225,7 +301,6 @@ const Registration = ({ navigation }) => {
             </TouchableOpacity>
           </View>
         </CustomModal>
-
         <CustomModal
           title={"Error"}
           buttonText={"Ok"}
@@ -246,6 +321,66 @@ const Registration = ({ navigation }) => {
             <Text style={{ color: BaseColor.greyColor, fontSize: 18 }}>
               Image must be less than 5 Mb
             </Text>
+          </View>
+        </CustomModal>
+        <CustomModal
+          title={"Error"}
+          buttonText={"Ok"}
+          buttonOnPress={() => {
+            setShowSummitFail(false);
+          }}
+          cancelOnPress={() => {
+            setShowSummitFail(false);
+          }}
+          subTitle={"Registration Failed"}
+          show={showSummitFail?.show}
+        >
+          <View
+            style={{
+              marginTop: 20
+            }}
+          >
+            <Text style={{ color: BaseColor.greyColor, fontSize: 18 }}>
+              {showSummitFail?.message}
+            </Text>
+            <TouchableOpacity
+              style={styles.modalErrorButton}
+              onPress={() => {
+                setShowSummitFail(false);
+              }}
+            >
+              <Text style={styles.modalErrorText}>Try again</Text>
+            </TouchableOpacity>
+          </View>
+        </CustomModal>
+        <CustomModal
+          title={"Success"}
+          buttonText={"Ok"}
+          buttonOnPress={() => {
+            setShowSummitSuccess(false);
+          }}
+          cancelOnPress={() => {
+            setShowSummitSuccess(false);
+            navigation.navigate("Login");
+          }}
+          subTitle={"Registered"}
+          show={showSummitSuccess}
+        >
+          <View style={styles.modalSuccessContainer}>
+            <Text style={styles.textStyle}>
+              Your registration is successful.{"\n"}Please wait for the next 7
+              working days for administrative approval. You will be informed via
+              the registered email. Thank you.
+            </Text>
+            <TouchableOpacity
+              style={styles.modalSuccessButton}
+              onPress={() => {
+                setShowSummitFail(false);
+                navigation.navigate("Login");
+              }}
+            >
+              <Text style={styles.modalSuccessText}>Ok</Text>
+            </TouchableOpacity>
           </View>
         </CustomModal>
       </ScrollView>

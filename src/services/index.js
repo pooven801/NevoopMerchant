@@ -1,7 +1,10 @@
 const productionURL = "https://nevoapi.azurewebsites.net";
-const localURL = "http://169.254.167.200:3000";
+const localURL = "http://169.254.134.11:3000";
 let currentURLProduction = false;
 const finalURL = currentURLProduction ? productionURL : localURL;
+
+//Run this in terminal if IP address failed
+// ifconfig | grep inet
 
 // Regional Store Image in Azure Storage
 
@@ -14,6 +17,21 @@ export async function storeBlobGetURL(params) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify(newParams)
+  }).then((data) => data.json());
+}
+
+//Regional End
+
+// Regional Merchant
+
+export async function createMerchant(params) {
+  console.log(finalURL + "/merchant/createMerchant");
+  return fetch(finalURL + "/merchant/createMerchant", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(params)
   }).then((data) => data.json());
 }
 
