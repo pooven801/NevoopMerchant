@@ -1,5 +1,4 @@
 import { StyleSheet } from "react-native";
-import { BaseColor } from "@config";
 
 export default StyleSheet.create({
   mainContainer: { flex: 1 },
@@ -76,21 +75,6 @@ export default StyleSheet.create({
     marginLeft: 5,
     alignSelf: "center",
     fontWeight: "bold",
-    color: "white"
-  },
-  modalErrorButton: {
-    backgroundColor: BaseColor.primaryColor,
-    height: 40,
-    width: "100%",
-    borderRadius: 30,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 10
-  },
-  modalErrorText: {
-    color: BaseColor.greyColor,
-    fontSize: 18,
-    alignSelf: "center",
     color: "white"
   }
 });

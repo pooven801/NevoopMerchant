@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -9,11 +9,18 @@ import {
   Alert
 } from "react-native";
 import styles from "./styles";
-// import { useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
+import * as AuthAction from "@actions/AuthAction";
+import { BaseColor, Images } from "@config";
+import { CustomModal } from "@components";
 
 const Login = ({ navigation }) => {
-  // const authUser = useSelector((state) => state.auth);
-  const [params, setParams] = useState({ email: "", pwd: "" });
+  const dispatch = useDispatch();
+  const [params, setParams] = useState({ email: "", password: "" });
+  const [showSummitFail, setShowSummitFail] = useState({
+    show: false,
+    message: ""
+  });
 
   return (
     <View style={styles.mainContainer}>
@@ -48,24 +55,23 @@ const Login = ({ navigation }) => {
             />
             <Text style={styles.subTitlesText}>Password</Text>
             <TextInput
-              onChangeText={(text) => setParams({ ...params, pwd: text })}
+              onChangeText={(text) => setParams({ ...params, password: text })}
               secureTextEntry={true}
               style={styles.subTitlesTextInput}
             />
           </View>
           <TouchableOpacity
             onPress={() => {
-              if ((params.email == "", params.pwd == "")) {
+              if ((params.email == "", params.password == "")) {
                 Alert.alert("Sorry", "All fields are required");
               } else {
-                // dispatch(AuthAction.authentication(params)).then((res) => {
-                //   if (res) {
-                //     console.log("Ggtry me", res);
-                //     navigation.navigate("Home");
-                //   } else {
-                //     Alert.alert("Sorry", "Authentication Error");
-                //   }
-                // });
+                dispatch(AuthAction.authentication(params)).then((res) => {
+                  if (res.success) {
+                    navigation.navigate("Home");
+                  } else {
+                    setShowSummitFail({ show: true, message: res?.message });
+                  }
+                });
               }
             }}
             style={styles.buttonContainer}
@@ -91,6 +97,36 @@ const Login = ({ navigation }) => {
             </Text>
           </TouchableOpacity>
         </View>
+        <CustomModal
+          title={"Error"}
+          buttonText={"Ok"}
+          buttonOnPress={() => {
+            setShowSummitFail(false);
+          }}
+          cancelOnPress={() => {
+            setShowSummitFail(false);
+          }}
+          subTitle={"Login Failed"}
+          show={showSummitFail?.show}
+        >
+          <View
+            style={{
+              marginTop: 20
+            }}
+          >
+            <Text style={{ color: BaseColor.greyColor, fontSize: 18 }}>
+              {showSummitFail?.message}
+            </Text>
+            <TouchableOpacity
+              style={styles.modalErrorButton}
+              onPress={() => {
+                setShowSummitFail(false);
+              }}
+            >
+              <Text style={styles.modalErrorText}>Try again</Text>
+            </TouchableOpacity>
+          </View>
+        </CustomModal>
       </ImageBackground>
     </View>
   );

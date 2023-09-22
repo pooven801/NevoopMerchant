@@ -35,4 +35,15 @@ export async function createMerchant(params) {
   }).then((data) => data.json());
 }
 
+export async function login(params) {
+  console.log("merchantSignin/signin", params);
+  return fetch(finalURL + "/merchantSignin/signin", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(params)
+  }).then((data) => data.json());
+}
+
 //Regional End

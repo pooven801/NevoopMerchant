@@ -1,19 +1,17 @@
 import React, { useEffect } from "react";
 import { View, Text, Image, ImageBackground } from "react-native";
 import styles from "./styles";
-// import { useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 
 const Loading = ({ navigation }) => {
-  // const authUser = useSelector((state) => state.auth);
+  const authUser = useSelector((state) => state.auth);
 
   const onProcess = () => {
-    // let status = authUser.login;
-    let status = true;
+    let status = authUser.login;
     switch (status) {
       case true:
         setTimeout(() => {
-          // navigation.navigate("Home");
-          navigation.navigate("Login");
+          navigation.navigate("Home");
         }, 1000);
         break;
       default:
