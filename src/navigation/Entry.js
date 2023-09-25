@@ -1,18 +1,30 @@
 import React, { useState } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useNavigation } from "@react-navigation/native";
 import Login from "@screens/Login";
 import Loading from "@screens/Loading";
 import Registration from "@screens/Registration";
 import Home from "@screens/Home";
-// import Registration from '@screens/Registration';
 
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
-export default function Entry() {
-  const navigation = useNavigation();
-  const [updateDelay, setUpdateDelay] = useState(10000);
+function TabNavigator() {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false
+      }}
+    >
+      <Tab.Screen name="HomeStack" component={HomeStack} />
+      <Tab.Screen name="Registration" component={Registration} />
+      <Tab.Screen name="Login" component={Login} />
+    </Tab.Navigator>
+  );
+}
 
+function HomeStack() {
   return (
     <Stack.Navigator
       screenOptions={{
@@ -26,4 +38,11 @@ export default function Entry() {
       <Stack.Screen name="Registration" component={Registration} />
     </Stack.Navigator>
   );
+}
+
+export default function Entry() {
+  const navigation = useNavigation();
+  const [updateDelay, setUpdateDelay] = useState(10000);
+
+  return <TabNavigator />;
 }
