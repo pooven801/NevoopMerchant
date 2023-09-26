@@ -23,11 +23,12 @@ export const authentication = (params, callback) => async (dispatch) => {
     return { success: true, message: "Logged out" };
   } else {
     let results = await Services.login(params);
+    console.log("results", results);
     if (results.success) {
       setTimeout(() => {
         let data = {
           success: true,
-          data: true
+          data: results.data
         };
         dispatch(onExecuted(ActionTypes.LOGIN, data));
       }, 1000);
