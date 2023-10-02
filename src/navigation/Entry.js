@@ -16,26 +16,20 @@ function TabNavigator() {
       screenOptions={{
         headerShown: false
       }}
+      // tabBarOptions={{
+      //   activeTintColor: "#fff",
+      //   inactiveTintColor: "lightgray",
+      //   activeBackgroundColor: "#c4461c",
+      //   inactiveBackgroundColor: "#b55031",
+      //   style: {
+      //     backgroundColor: "#CE4418",
+      //     paddingBottom: 3
+      //   }
+      // }}
     >
       <Tab.Screen name="Home" component={Home} />
-      <Stack.Screen name="AddService" component={AddService} />
+      {/* <Stack.Screen name="AddService" component={AddService} /> */}
     </Tab.Navigator>
-  );
-}
-
-function HomeStack() {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false
-      }}
-      initialRouteName="Loading"
-    >
-      <Stack.Screen name="Login" component={Login} />
-      <Stack.Screen name="Home" component={Home} />
-      <Stack.Screen name="Loading" component={Loading} />
-      <Stack.Screen name="Registration" component={Registration} />
-    </Stack.Navigator>
   );
 }
 
@@ -51,6 +45,7 @@ export default function Entry() {
       <Stack.Screen name="Login" component={Login} />
       <Stack.Screen name="Loading" component={Loading} />
       <Stack.Screen name="Registration" component={Registration} />
+      <Stack.Screen name="AddService" component={AddService} />
     </Stack.Navigator>
   );
 }

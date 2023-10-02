@@ -15,7 +15,7 @@ let TurquoiseColor = {
   primaryColor: "#138D75",
   darkPrimaryColor: "#0E6655",
   lightPrimaryColor: "#A2D9CE",
-  backgroundPrimaryColor: "#E8F6F3",
+  backgroundPrimaryColor: "#CADFDD",
   basePrimaryColor: "#E8F6F3",
   accentColor: "#CCD1D1"
 };

@@ -15,7 +15,7 @@ import styles from "./styles";
 import { useDispatch, useSelector } from "react-redux";
 import * as AuthAction from "@actions/AuthAction";
 import { CustomStatusBar } from "@components";
-import { BaseColor, GreenColor } from "@config";
+import { BaseColor, GreenColor, Images } from "@config";
 // import { useSelector } from "react-redux";
 
 const Home = ({ navigation }) => {
@@ -23,8 +23,8 @@ const Home = ({ navigation }) => {
   const [params, setParams] = useState({ email: "", pwd: "" });
   const dispatch = useDispatch();
   const authUser = useSelector((state) => state.auth.data);
-  const subItemsFirst = ["Add Service", "Service List", "Payout"];
-  const subItemsSecond = ["Booking", "Status", "Support"];
+  const subItemsFirst = ["Add Service", "Service List", "Payout", "Booking"];
+  const subItemsSecond = ["Status", "Support"];
   console.log(authUser);
   return (
     <View style={styles.mainContainer}>
@@ -35,15 +35,15 @@ const Home = ({ navigation }) => {
       <View
         style={{
           minHeight: "25%",
-          width: "90%",
-          backgroundColor: BaseColor.darkPrimaryColor,
-          borderRadius: 20,
+          width: "95%",
+          backgroundColor: BaseColor.primaryColor,
+          borderRadius: 10,
           alignSelf: "center",
           marginTop: Platform.OS == "android" ? 40 : 20
         }}
       >
         <Image
-          src={authUser?.icImg}
+          src={authUser?.logoImg}
           style={{
             width: 140,
             height: "80%",
@@ -57,21 +57,21 @@ const Home = ({ navigation }) => {
         />
         <View style={{ margin: 15 }}>
           <Text style={{ color: "white" }}>Company Name</Text>
-          <Text style={{ color: "white", fontSize: 18, marginBottom: 5 }}>
-            {authUser.companyName}
+          <Text style={{ color: "white", fontSize: 18, marginBottom: 10 }}>
+            {authUser?.companyName}
           </Text>
           <Text style={{ color: "white" }}>SSM No</Text>
-          <Text style={{ color: "white", fontSize: 18, marginBottom: 5 }}>
-            {authUser.ssmno}
+          <Text style={{ color: "white", fontSize: 18, marginBottom: 10 }}>
+            {authUser?.ssmno}
           </Text>
           <Text style={{ color: "white" }}>Balance</Text>
           <Text style={{ color: "white", fontSize: 18, marginBottom: 5 }}>
             RM 42344
           </Text>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
-              backgroundColor: GreenColor.primaryColor,
+              backgroundColor: BaseColor.primaryColor,
               width: 100,
               height: 30,
               borderRadius: 5,
@@ -81,37 +81,110 @@ const Home = ({ navigation }) => {
           >
             <Text
               style={{
-                color: "green",
+                color: "white",
                 fontSize: 18,
                 fontWeight: "bold"
               }}
             >
               Cash Out
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
-
-      <View style={{ flexDirection: "row", marginTop: 40 }}>
-        {subItemsFirst.map((res) => {
+      <View
+        style={{
+          flexDirection: "row",
+          marginTop: 20,
+          marginLeft: 10,
+          marginBottom: 5
+        }}
+      >
+        <Text
+          style={{
+            color: BaseColor.primaryColor,
+            fontWeight: "bold",
+            fontSize: 15,
+            marginRight: 5
+          }}
+        >
+          Main
+        </Text>
+        <Image
+          source={Images.icons.processorIcon}
+          style={{
+            width: 20,
+            height: 20,
+            alignSelf: "center"
+          }}
+        />
+      </View>
+      <View style={{ flexDirection: "row" }}>
+        {subItemsFirst.map((res, index) => {
           return (
             <TouchableOpacity
               style={{
-                width: Dimensions.get("window").width / 3 - 10,
+                width: Dimensions.get("window").width / 4 - 10,
                 marginHorizontal: 5,
-                height: 100,
+                height: 90,
                 borderRadius: 10,
+                justifyContent: "center",
                 backgroundColor: BaseColor.primaryColor
               }}
+              onPress={() => {
+                navigation.navigate("AddService");
+              }}
             >
+              {index == 0 && (
+                <Image
+                  style={{
+                    width: 50,
+                    height: 50,
+                    alignSelf: "center",
+                    top: -5
+                  }}
+                  source={require("../../assets/icons/icons8-add-50.png")}
+                />
+              )}
+              {index == 1 && (
+                <Image
+                  style={{
+                    width: 50,
+                    height: 50,
+                    alignSelf: "center",
+                    top: -5
+                  }}
+                  source={require("../../assets/icons/icons8-search-in-list-50.png")}
+                />
+              )}
+              {index == 2 && (
+                <Image
+                  style={{
+                    width: 50,
+                    height: 50,
+                    alignSelf: "center",
+                    top: -5
+                  }}
+                  source={require("../../assets/icons/icons8-payout-64.png")}
+                />
+              )}
+              {index == 3 && (
+                <Image
+                  style={{
+                    width: 50,
+                    height: 50,
+                    alignSelf: "center",
+                    top: -5
+                  }}
+                  source={require("../../assets/icons/icons8-booking-80.png")}
+                />
+              )}
               <Text
                 style={{
-                  fontSize: 16,
-                  color: "white",
+                  fontSize: 12,
+                  color: BaseColor.whiteColor,
                   position: "absolute",
-                  alignSelf: "center",
-                  bottom: "0",
-                  justifyContent: "center"
+                  bottom: 5,
+                  alignSelf: "center"
                 }}
               >
                 {res}
@@ -121,25 +194,47 @@ const Home = ({ navigation }) => {
         })}
       </View>
       <View style={{ flexDirection: "row", marginTop: 20 }}>
-        {subItemsSecond.map((res) => {
+        {subItemsSecond.map((res, index) => {
           return (
             <TouchableOpacity
               style={{
-                width: Dimensions.get("window").width / 3 - 10,
+                width: Dimensions.get("window").width / 4 - 10,
                 marginHorizontal: 5,
-                height: 100,
+                height: 90,
                 borderRadius: 10,
+                justifyContent: "center",
                 backgroundColor: BaseColor.primaryColor
               }}
             >
+              {index == 0 && (
+                <Image
+                  style={{
+                    width: 50,
+                    height: 50,
+                    alignSelf: "center",
+                    top: -5
+                  }}
+                  source={require("../../assets/icons/icons8-status-80.png")}
+                />
+              )}
+              {index == 1 && (
+                <Image
+                  style={{
+                    width: 50,
+                    height: 50,
+                    alignSelf: "center",
+                    top: -5
+                  }}
+                  source={require("../../assets/icons/icons8-support-68.png")}
+                />
+              )}
               <Text
                 style={{
-                  fontSize: 16,
-                  color: "white",
+                  fontSize: 12,
+                  color: BaseColor.whiteColor,
                   position: "absolute",
-                  alignSelf: "center",
-                  bottom: "0",
-                  justifyContent: "center"
+                  bottom: 5,
+                  alignSelf: "center"
                 }}
               >
                 {res}

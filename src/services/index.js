@@ -1,5 +1,7 @@
 const productionURL = "https://nevoapi.azurewebsites.net";
-const localURL = "http://169.254.50.71:3000";
+const localURL = "http://169.254.123.50:3000";
+// const localURL = "http://localhost:3000";
+
 let currentURLProduction = false;
 const finalURL = currentURLProduction ? productionURL : localURL;
 
@@ -36,7 +38,7 @@ export async function createMerchant(params) {
 }
 
 export async function login(params) {
-  console.log("merchantSignin/signin", params);
+  console.log(localURL + "/merchantSignin/signin", params);
   return fetch(finalURL + "/merchantSignin/signin", {
     method: "POST",
     headers: {
@@ -44,6 +46,38 @@ export async function login(params) {
     },
     body: JSON.stringify(params)
   }).then((data) => data.json());
+}
+
+//Regional End
+
+// Regional Services
+
+export async function createServices(params, formType) {
+  console.log(finalURL + `/service/${formType}`, params);
+  return fetch(finalURL + `/service/${formType}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(params)
+  }).then((data) => data.json());
+}
+
+export async function getServiceList(pagination, serviceType) {
+  console.log(
+    finalURL +
+      `/service/${serviceType}?pageNum=${pagination?.pagination?.pageNum}&docPerPage=${pagination.pagination?.docPerPage}`
+  );
+  return fetch(
+    finalURL +
+      `/service/${serviceType}?pageNum=${pagination?.pagination?.pageNum}&docPerPage=${pagination.pagination?.docPerPage}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }
+  ).then((data) => data.json());
 }
 
 //Regional End

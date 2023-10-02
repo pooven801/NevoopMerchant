@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 import { BaseColor, GreenColor, BlueColor } from "@config";
 
 export default StyleSheet.create({
-  mainContainer: { flex: 1, backgroundColor: BaseColor.accentColor },
+  mainContainer: { flex: 1, backgroundColor: "#CADFDD" },
   subContainer: { alignSelf: "center" },
   backgroundContainer: {
     flex: 1,
