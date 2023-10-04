@@ -8,7 +8,8 @@ import {
   TextInput,
   Alert,
   Platform,
-  StatusBar
+  StatusBar,
+  ScrollView
 } from "react-native";
 import styles from "./styles";
 import { useDispatch, useSelector } from "react-redux";
@@ -65,7 +66,9 @@ const AddService = ({ navigation }) => {
           );
         }}
       />
-      <FoodForm />
+      <ScrollView>
+        <FoodForm />
+      </ScrollView>
     </View>
   );
 };

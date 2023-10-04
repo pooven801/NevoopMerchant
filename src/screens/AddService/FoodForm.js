@@ -9,7 +9,8 @@ import {
   Alert,
   Platform,
   StatusBar,
-  Dimensions
+  Dimensions,
+  ScrollView
 } from "react-native";
 import styles from "./styles";
 import { useDispatch, useSelector } from "react-redux";
@@ -19,18 +20,44 @@ import { BaseColor, Images } from "@config";
 import Carousel from "react-native-reanimated-carousel";
 import * as Services from "@services";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import { Dropdown } from "react-native-element-dropdown";
 // import { useSelector } from "react-redux";
 
 const FoodForm = ({ navigation }) => {
   const authUser = useSelector((state) => state.auth.data);
   const dispatch = useDispatch();
-  const [params, setParams] = useState({ images: [] });
+  const [params, setParams] = useState({
+    images: [],
+    minMaxPlateCount: { min: "", max: "" }
+  });
   const [showImageModal, setShowImageModal] = useState(false);
   const [imageAutoPlay, setImageAutoPlay] = useState(true);
   const [confirmDeleteModal, setConfirmDeleteModal] = useState(false);
   const [showImgSizeAlert, setShowImgSizeAlert] = useState(false);
+  const [doProvideServant, setDoProvideServant] = useState(null);
   const [currentDeleteImageIndex, setCurrentDeleteImageIndex] = useState(0);
+  const [value, setValue] = useState(null);
   const width = Dimensions.get("window").width;
+  const menuTypeItem = [
+    { label: "Full Set", value: "Full Set" },
+    { label: "Alacarte", value: "Alacarte" }
+  ];
+  const provideServantItem = [
+    { label: "Yes", value: "Yes" },
+    { label: "No", value: "No" }
+  ];
+  const isHalalItem = ["Yes", "No"];
+  const cuisineData = [
+    { label: "Malay", value: "Malay" },
+    { label: "Chinese", value: "Chinese" },
+    { label: "Indian", value: "Indian" },
+    { label: "Malay-Chinese", value: "Malay-Chinese" },
+    { label: "Malay-Indian", value: "Malay-Indian" },
+    { label: "Sabahan", value: "Sabahan" },
+    { label: "Sarawakian", value: "Sarawakian" },
+    { label: "Peranakan", value: "Peranakan" },
+    { label: "Western", value: "Western" }
+  ];
 
   useEffect(() => {
     // Check for changes in data and update the carousel
@@ -59,25 +86,20 @@ const FoodForm = ({ navigation }) => {
     });
   };
 
+  const renderItem = (item) => {
+    return (
+      <View style={styles.item}>
+        <Text style={styles.textItem}>{item.label}</Text>
+      </View>
+    );
+  };
+  console.log(params);
   return (
     <View style={styles.mainContainer}>
       <View style={{}}>
         {params?.images.length == 0 ? (
-          <View
-            style={{
-              backgroundColor: "grey",
-              width: "90%",
-              height: 220,
-              alignSelf: "center",
-              borderRadius: 10,
-              justifyContent: "center",
-              margin: 20
-            }}
-          >
-            <Image
-              source={Images.icons.imageIcon}
-              style={{ width: 100, height: 100, alignSelf: "center" }}
-            />
+          <View style={styles.emptyImageContainer}>
+            <Image source={Images.icons.imageIcon} style={styles.emptyImage} />
           </View>
         ) : (
           <Carousel
@@ -90,25 +112,8 @@ const FoodForm = ({ navigation }) => {
             scrollAnimationDuration={1000}
             // onSnapToItem={(index) => console.log("current index:", index)}
             renderItem={({ index, item }) => (
-              <View
-                style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  padding: 10
-                }}
-              >
-                <Image
-                  src={item}
-                  style={{
-                    backgroundColor: "grey",
-                    width: "100%",
-                    height: 220,
-                    alignSelf: "center",
-                    borderRadius: 10,
-                    justifyContent: "center",
-                    marginTop: 20
-                  }}
-                />
+              <View style={styles.scrollImageContainer}>
+                <Image src={item} style={styles.imageStyle} />
                 <TouchableOpacity
                   style={styles.cancelButtonContainer}
                   onPress={() => {
@@ -124,7 +129,7 @@ const FoodForm = ({ navigation }) => {
                 >
                   <Image
                     source={Images.icons.cancelRoundRed}
-                    style={{ width: 40, height: 40 }}
+                    style={styles.cancelImage}
                   />
                 </TouchableOpacity>
               </View>
@@ -133,31 +138,295 @@ const FoodForm = ({ navigation }) => {
         )}
       </View>
       <TouchableOpacity
-        style={{
-          marginTop: params?.images.length == 0 ? -10 : 10,
-          width: "50%",
-          height: 40,
-          borderRadius: 10,
-          backgroundColor: BaseColor.primaryColor,
-          marginHorizontal: 20,
-          alignSelf: "center",
-          justifyContent: "center"
-        }}
+        style={[
+          {
+            marginTop: params?.images.length == 0 ? -10 : 10
+          },
+          styles.uploadButton
+        ]}
         onPress={() => {
           setShowImageModal(true);
         }}
       >
-        <Text
-          style={{
-            color: "white",
-            fontSize: 18,
-            fontWeight: "bold",
-            alignSelf: "center"
-          }}
-        >
-          Upload Image
-        </Text>
+        <Text style={styles.uploadText}>Upload Image</Text>
       </TouchableOpacity>
+      <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>
+        Plate Count
+      </Text>
+      <View style={{ flexDirection: "row", width: "100%" }}>
+        <TextInput
+          onChangeText={(text) =>
+            setParams({
+              ...params,
+              minMaxPlateCount: {
+                ...params.minMaxPlateCount,
+                min: text.replace(/[^0-9]/g, "")
+              }
+            })
+          }
+          placeholder={"Min"}
+          keyboardType={"number-pad"}
+          value={params.minMaxPlateCount.min}
+          style={{
+            backgroundColor: "white",
+            marginHorizontal: 10,
+            height: 40,
+            borderRadius: 10,
+            fontSize: 16,
+            width: "45%"
+          }}
+        />
+        <TextInput
+          onChangeText={(text) =>
+            setParams({
+              ...params,
+              minMaxPlateCount: {
+                ...params.minMaxPlateCount,
+                max: text.replace(/[^0-9]/g, "")
+              }
+            })
+          }
+          value={params.minMaxPlateCount.max}
+          placeholder={"Max"}
+          keyboardType={"number-pad"}
+          style={{
+            backgroundColor: "white",
+            marginHorizontal: 10,
+            height: 40,
+            borderRadius: 10,
+            fontSize: 16,
+            width: "45%"
+          }}
+        />
+      </View>
+      <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>
+        Menu Type
+      </Text>
+      <Dropdown
+        style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={menuTypeItem}
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder="Select item"
+        searchPlaceholder="Search..."
+        value={params.menuType}
+        onChange={(item) => {
+          setParams({
+            ...params,
+            menuType: item.value
+          });
+        }}
+        renderItem={renderItem}
+      />
+
+      <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>
+        Choose Cuisine
+      </Text>
+      <Dropdown
+        style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={cuisineData}
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder="Select item"
+        searchPlaceholder="Search..."
+        value={params.cuisine}
+        onChange={(item) => {
+          setParams({
+            ...params,
+            cuisine: item.value
+          });
+          setValue(item.value);
+        }}
+        renderItem={renderItem}
+      />
+      <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>
+        Provide Servant
+      </Text>
+      <Dropdown
+        style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={provideServantItem}
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder="Select item"
+        searchPlaceholder="Search..."
+        value={doProvideServant}
+        onChange={(item) => {
+          setDoProvideServant(item.value);
+        }}
+        renderItem={renderItem}
+      />
+      {doProvideServant == "Yes" && (
+        <View>
+          <Text
+            style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}
+          >
+            Number Of Servants
+          </Text>
+          <TextInput
+            onChangeText={(text) =>
+              setParams({
+                ...params,
+                provideServant: {
+                  ...params.pricePerServant,
+                  numberOfServant: text
+                }
+              })
+            }
+            value={params?.provideServant?.numberOfServant}
+            placeholder={"Number Of Servants"}
+            style={{
+              backgroundColor: "white",
+              marginHorizontal: 10,
+              height: 40,
+              borderRadius: 10,
+              fontSize: 16
+            }}
+          />
+          <Text
+            style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}
+          >
+            Price Per Servant (Hourly)
+          </Text>
+          <TextInput
+            onChangeText={(text) =>
+              setParams({
+                ...params,
+                provideServant: {
+                  ...params.numberOfServant,
+                  pricePerServant: text
+                }
+              })
+            }
+            value={params?.provideServant?.pricePerServant}
+            placeholder={" Price Per Servant (Hourly)"}
+            style={{
+              backgroundColor: "white",
+              marginHorizontal: 10,
+              height: 40,
+              borderRadius: 10,
+              fontSize: 16
+            }}
+          />
+        </View>
+      )}
+      <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>
+        Video Link
+      </Text>
+      <TextInput
+        onChangeText={(text) =>
+          setParams({
+            ...params,
+            videoLink: text
+          })
+        }
+        value={params?.videoLink}
+        placeholder={"Video Link"}
+        style={{
+          backgroundColor: "white",
+          marginHorizontal: 10,
+          height: 40,
+          borderRadius: 10,
+          fontSize: 16
+        }}
+      />
+      <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>
+        Food Name
+      </Text>
+      <TextInput
+        onChangeText={(text) =>
+          setParams({
+            ...params,
+            name: text
+          })
+        }
+        value={params?.name}
+        placeholder={"Food Name"}
+        style={{
+          backgroundColor: "white",
+          marginHorizontal: 10,
+          height: 40,
+          borderRadius: 10,
+          fontSize: 16
+        }}
+      />
+      <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>
+        Description
+      </Text>
+      <TextInput
+        onChangeText={(text) =>
+          setParams({
+            ...params,
+            description: text
+          })
+        }
+        value={params?.description}
+        placeholder={"Description"}
+        multiline={true}
+        style={{
+          backgroundColor: "white",
+          marginHorizontal: 10,
+          height: 150,
+          borderRadius: 10,
+          fontSize: 16,
+          textAlignVertical: "top"
+        }}
+      />
+      <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>
+        Price Per Plate
+      </Text>
+      <TextInput
+        onChangeText={(text) =>
+          setParams({
+            ...params,
+            pricePerPlate: text
+          })
+        }
+        value={params?.pricePerPlate}
+        placeholder={"Price Per Plate"}
+        style={{
+          backgroundColor: "white",
+          marginHorizontal: 10,
+          height: 40,
+          borderRadius: 10,
+          fontSize: 16
+        }}
+      />
+      <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>
+        Transport Price Per KM(RM)
+      </Text>
+      <TextInput
+        onChangeText={(text) =>
+          setParams({
+            ...params,
+            transportPrice: text
+          })
+        }
+        value={params?.transportPrice}
+        placeholder={"Transport Price Per KM(RM)"}
+        style={{
+          backgroundColor: "white",
+          marginHorizontal: 10,
+          height: 40,
+          borderRadius: 10,
+          fontSize: 16,
+          marginBottom: 50
+        }}
+      />
       <CustomModal
         title={"Confirm"}
         cancelOnPress={() => {
@@ -172,49 +441,21 @@ const FoodForm = ({ navigation }) => {
             marginTop: 20
           }}
         >
-          <Text style={{ color: BaseColor.greyColor, fontSize: 18 }}>
+          <Text style={styles.deleteModalTitle}>
             Are you sure wanna delete this image?
           </Text>
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
+          <View style={styles.deleteModalSubContainer}>
             <TouchableOpacity
-              style={{
-                marginTop: 20,
-                width: "40%",
-                height: 40,
-                borderRadius: 10,
-                backgroundColor: BaseColor.primaryColor,
-
-                alignSelf: "center",
-                justifyContent: "center"
-              }}
+              style={styles.deleteModalButton}
               onPress={() => {
                 setConfirmDeleteModal(false);
                 setImageAutoPlay(true);
               }}
             >
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: 18,
-                  fontWeight: "bold",
-                  alignSelf: "center"
-                }}
-              >
-                No
-              </Text>
+              <Text style={styles.deleteModalButtonText}>No</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={{
-                marginTop: 20,
-                width: "40%",
-                height: 40,
-                borderRadius: 10,
-                backgroundColor: BaseColor.redColor,
-                alignSelf: "center",
-                justifyContent: "center"
-              }}
+              style={styles.deleteModalButton}
               onPress={() => {
                 let newImagesArray = [
                   ...params.images.splice(currentDeleteImageIndex, 1)
@@ -231,16 +472,7 @@ const FoodForm = ({ navigation }) => {
                 });
               }}
             >
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: 18,
-                  fontWeight: "bold",
-                  alignSelf: "center"
-                }}
-              >
-                Yes
-              </Text>
+              <Text style={styles.deleteModalButtonText}>Yes</Text>
             </TouchableOpacity>
           </View>
         </View>
