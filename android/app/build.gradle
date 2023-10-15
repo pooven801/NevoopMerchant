@@ -72,6 +72,10 @@ android {
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
+    compileOptions {
+        sourceCompatibility 11
+        targetCompatibility 11
+    }
 
     namespace "com.nevoopmerchant"
     defaultConfig {

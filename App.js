@@ -5,6 +5,9 @@ import Entry from "./src/navigation/Entry";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistor, store } from "./src/store";
 import { Provider } from "react-redux";
+import { enableLatestRenderer } from "react-native-maps";
+
+enableLatestRenderer();
 
 const AppWrapper = () => {
   return (

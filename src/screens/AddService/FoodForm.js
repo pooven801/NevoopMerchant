@@ -15,7 +15,12 @@ import {
 import styles from "./styles";
 import { useDispatch, useSelector } from "react-redux";
 import * as AuthAction from "@actions/AuthAction";
-import { CustomStatusBar, Header, CustomModal } from "@components";
+import {
+  CustomStatusBar,
+  Header,
+  CustomModal,
+  MapCoordinateMarking
+} from "@components";
 import { BaseColor, Images } from "@config";
 import Carousel from "react-native-reanimated-carousel";
 import * as Services from "@services";
@@ -23,12 +28,13 @@ import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { Dropdown } from "react-native-element-dropdown";
 // import { useSelector } from "react-redux";
 
-const FoodForm = ({ navigation }) => {
+const FoodForm = (props) => {
   const authUser = useSelector((state) => state.auth.data);
   const dispatch = useDispatch();
   const [params, setParams] = useState({
     images: [],
-    minMaxPlateCount: { min: "", max: "" }
+    minMaxPlateCount: { min: "", max: "" },
+    locationCoordinate: null
   });
   const [showImageModal, setShowImageModal] = useState(false);
   const [imageAutoPlay, setImageAutoPlay] = useState(true);
@@ -46,7 +52,10 @@ const FoodForm = ({ navigation }) => {
     { label: "Yes", value: "Yes" },
     { label: "No", value: "No" }
   ];
-  const isHalalItem = ["Yes", "No"];
+  const isHalalItem = [
+    { label: "Yes", value: "Yes" },
+    { label: "No", value: "No" }
+  ];
   const cuisineData = [
     { label: "Malay", value: "Malay" },
     { label: "Chinese", value: "Chinese" },
@@ -58,6 +67,8 @@ const FoodForm = ({ navigation }) => {
     { label: "Peranakan", value: "Peranakan" },
     { label: "Western", value: "Western" }
   ];
+  const { mapOnPress } = props;
+  console.log("propssx", mapOnPress);
 
   useEffect(() => {
     // Check for changes in data and update the carousel
@@ -93,7 +104,7 @@ const FoodForm = ({ navigation }) => {
       </View>
     );
   };
-  console.log(params);
+
   return (
     <View style={styles.mainContainer}>
       <View style={{}}>
@@ -120,11 +131,6 @@ const FoodForm = ({ navigation }) => {
                     setConfirmDeleteModal(true);
                     setImageAutoPlay(false);
                     setCurrentDeleteImageIndex(index);
-                    console.log(
-                      params,
-                      currentDeleteImageIndex,
-                      params?.images.length
-                    );
                   }}
                 >
                   <Image
@@ -237,7 +243,7 @@ const FoodForm = ({ navigation }) => {
         maxHeight={300}
         labelField="label"
         valueField="value"
-        placeholder="Select item"
+        placeholder="Select"
         searchPlaceholder="Search..."
         value={params.cuisine}
         onChange={(item) => {
@@ -262,11 +268,21 @@ const FoodForm = ({ navigation }) => {
         maxHeight={300}
         labelField="label"
         valueField="value"
-        placeholder="Select item"
+        placeholder="Select"
         searchPlaceholder="Search..."
         value={doProvideServant}
         onChange={(item) => {
-          setDoProvideServant(item.value);
+          if (item.value == "No") {
+            setParams({
+              ...params,
+              provideServant: {
+                numberOfServant: "",
+                pricePerServant: ""
+              }
+            });
+          } else {
+            setDoProvideServant(item.value);
+          }
         }}
         renderItem={renderItem}
       />
@@ -324,6 +340,30 @@ const FoodForm = ({ navigation }) => {
           />
         </View>
       )}
+      <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>
+        Product Halal?
+      </Text>
+      <Dropdown
+        style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={isHalalItem}
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder="Select"
+        searchPlaceholder="Search..."
+        value={doProvideServant}
+        onChange={(item) => {
+          setParams({
+            ...params,
+            isHalal: item.value
+          });
+        }}
+        renderItem={renderItem}
+      />
       <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>
         Video Link
       </Text>
@@ -406,6 +446,23 @@ const FoodForm = ({ navigation }) => {
           fontSize: 16
         }}
       />
+      <TouchableOpacity
+        style={{
+          backgroundColor: BaseColor.primaryColor,
+          height: 40,
+          marginHorizontal: 10,
+          borderRadius: 10,
+          marginTop: 15
+        }}
+        onPress={() => {
+          mapOnPress();
+        }}
+      >
+        <Text style={{ color: "white", fontSize: 16, margin: 10 }}>
+          Mark Location :{" "}
+          {params.locationCoordinate == null ? "No Location Selected" : "SET"}
+        </Text>
+      </TouchableOpacity>
       <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>
         Transport Price Per KM(RM)
       </Text>
@@ -465,10 +522,6 @@ const FoodForm = ({ navigation }) => {
                 setParams({
                   ...params,
                   images: [...params.images.splice(currentDeleteImageIndex, 1)]
-                });
-                console.log({
-                  ...params,
-                  images: [...newImagesArray]
                 });
               }}
             >

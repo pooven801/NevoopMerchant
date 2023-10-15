@@ -51,7 +51,8 @@ const AddService = ({ navigation }) => {
           navigation.goBack();
         }}
         onPressRight={() => {
-          callRegisterMerchant();
+          // callRegisterMerchant();
+          navigation.navigate("MarkLocation");
         }}
         renderRight={() => {
           return (
@@ -67,7 +68,11 @@ const AddService = ({ navigation }) => {
         }}
       />
       <ScrollView>
-        <FoodForm />
+        <FoodForm
+          mapOnPress={() => {
+            navigation.navigate("MarkLocation");
+          }}
+        />
       </ScrollView>
     </View>
   );
