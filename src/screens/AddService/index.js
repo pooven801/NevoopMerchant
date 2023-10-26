@@ -17,12 +17,21 @@ import * as AuthAction from "@actions/AuthAction";
 import { CustomStatusBar, Header } from "@components";
 import { BaseColor } from "@config";
 import FoodForm from "./FoodForm";
+import MarkLocation from "../MarkLocation";
 // import { useSelector } from "react-redux";
 
 const AddService = ({ navigation }) => {
   const [params, setParams] = useState({ email: "", pwd: "" });
+  const [markedCoordinate, setMarkedCoordinate] = useState({
+    latitude: 2.9213,
+    longitude: 101.6559
+  });
   const dispatch = useDispatch();
   const authUser = useSelector((state) => state.auth);
+
+  const locationCallback = (res) => {
+    setMarkedCoordinate(res);
+  };
   return (
     <View style={styles.mainContainer}>
       <CustomStatusBar
@@ -69,8 +78,12 @@ const AddService = ({ navigation }) => {
       />
       <ScrollView>
         <FoodForm
+          location={markedCoordinate}
           mapOnPress={() => {
-            navigation.navigate("MarkLocation");
+            navigation.navigate("MarkLocation", {
+              updateLocation: locationCallback,
+              markedCoordinate: markedCoordinate
+            });
           }}
         />
       </ScrollView>

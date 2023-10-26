@@ -34,7 +34,7 @@ const FoodForm = (props) => {
   const [params, setParams] = useState({
     images: [],
     minMaxPlateCount: { min: "", max: "" },
-    locationCoordinate: null
+    locationCoordinate: props.location
   });
   const [showImageModal, setShowImageModal] = useState(false);
   const [imageAutoPlay, setImageAutoPlay] = useState(true);
@@ -67,7 +67,7 @@ const FoodForm = (props) => {
     { label: "Peranakan", value: "Peranakan" },
     { label: "Western", value: "Western" }
   ];
-  const { mapOnPress } = props;
+  const { mapOnPress, location } = props;
   console.log("propssx", mapOnPress);
 
   useEffect(() => {
@@ -446,21 +446,24 @@ const FoodForm = (props) => {
           fontSize: 16
         }}
       />
+      <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>
+        Service Location
+      </Text>
       <TouchableOpacity
         style={{
           backgroundColor: BaseColor.primaryColor,
           height: 40,
           marginHorizontal: 10,
-          borderRadius: 10,
-          marginTop: 15
+          borderRadius: 10
         }}
         onPress={() => {
           mapOnPress();
         }}
       >
         <Text style={{ color: "white", fontSize: 16, margin: 10 }}>
-          Mark Location :{" "}
-          {params.locationCoordinate == null ? "No Location Selected" : "SET"}
+          {params.locationCoordinate == null
+            ? "Mark Location : No Location Selected"
+            : `Latitude: ${location.latitude}, Longitude: ${location.longitude}`}
         </Text>
       </TouchableOpacity>
       <Text style={{ color: "black", fontSize: 16, margin: 10, marginTop: 15 }}>

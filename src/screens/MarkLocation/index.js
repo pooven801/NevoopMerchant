@@ -1,20 +1,29 @@
-import React, { useEffect } from "react";
-import { View, Text, Image, ImageBackground } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  ImageBackground,
+  TouchableOpacity
+} from "react-native";
 import styles from "./styles";
 import { useSelector } from "react-redux";
-import MapView from "react-native-maps";
+import MapView, { Marker } from "react-native-maps";
 import { CustomStatusBar, Header } from "@components";
 import { BaseColor } from "@config";
 
-const MarkLocation = ({ navigation }) => {
+const MarkLocation = ({ navigation, route }) => {
   const authUser = useSelector((state) => state.auth);
+  const [markedCoordinate, setMarkedCoordinate] = useState(
+    route.params.markedCoordinate
+  );
   const initialRegion = {
-    latitude: 3.085252,
-    longitude: 101.692468,
+    latitude: markedCoordinate.latitude,
+    longitude: markedCoordinate.longitude,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421
   };
-
+  console.log(route.params);
   return (
     <View style={styles.mainContainer}>
       <CustomStatusBar
@@ -47,9 +56,18 @@ const MarkLocation = ({ navigation }) => {
         style={{ height: "100%", width: "100" }}
         initialRegion={initialRegion}
         onMapReady={(res) => {
-          console.log(res);
+          // console.log(res);
         }}
-      />
+        onPress={(res) => {
+          setMarkedCoordinate(res.nativeEvent.coordinate);
+        }}
+      >
+        <Marker
+          draggable
+          coordinate={markedCoordinate}
+          onDragEnd={(e) => setMarkedCoordinate(e.nativeEvent.coordinate)}
+        />
+      </MapView>
       <View
         style={{
           width: "100%",
@@ -61,7 +79,40 @@ const MarkLocation = ({ navigation }) => {
           borderTopRightRadius: 40,
           borderTopLeftRadius: 40
         }}
-      ></View>
+      >
+        <Text
+          style={{
+            color: "white",
+            fontStyle: "italic",
+            fontSize: 20,
+            alignSelf: "center",
+            top: 20
+          }}
+        >
+          Latitude: {markedCoordinate.latitude}
+          {"\n"}Longitude: {markedCoordinate.longitude}
+        </Text>
+        <TouchableOpacity
+          style={{
+            width: "80%",
+            height: "30%",
+            backgroundColor: BaseColor.darkPrimaryColor,
+            borderRadius: 10,
+            position: "absolute",
+            alignSelf: "center",
+            bottom: 30,
+            justifyContent: "center"
+          }}
+          onPress={(res) => {
+            route.params.updateLocation(markedCoordinate);
+            navigation.goBack({ param: "dscsd" });
+          }}
+        >
+          <Text style={{ color: "white", fontSize: 18, alignSelf: "center" }}>
+            Mark Coordinate
+          </Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
