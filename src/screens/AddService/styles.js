@@ -73,10 +73,9 @@ export default StyleSheet.create({
     fontWeight: "bold",
     alignSelf: "center"
   },
-
   dropdown: {
     marginHorizontal: 10,
-    height: 40,
+    height: 50,
     backgroundColor: "white",
     borderRadius: 10,
     padding: 12,
@@ -87,7 +86,26 @@ export default StyleSheet.create({
     },
     shadowOpacity: 0.2,
     shadowRadius: 1.41,
-
+    elevation: 2
+  },
+  dropdownMain: {
+    marginHorizontal: 10,
+    height: 30,
+    width: "50%",
+    alignSelf: "center",
+    backgroundColor: BaseColor.lightPrimaryColor,
+    borderWidth: 1.5,
+    borderColor: BaseColor.primaryColor,
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    padding: 12,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 1
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.41,
     elevation: 2
   },
   icon: {
@@ -107,7 +125,8 @@ export default StyleSheet.create({
     fontSize: 16
   },
   selectedTextStyle: {
-    fontSize: 16
+    fontSize: 16,
+    color: BaseColor.darkPrimaryColor
   },
   iconStyle: {
     width: 20,
@@ -116,5 +135,35 @@ export default StyleSheet.create({
   inputSearchStyle: {
     height: 40,
     fontSize: 16
+  },
+  textStyle: { color: "black", fontSize: 16, margin: 10, marginTop: 15 },
+  textInputHalfStyle: {
+    backgroundColor: "white",
+    marginHorizontal: 10,
+    height: 40,
+    borderRadius: 10,
+    fontSize: 16,
+    width: "45%"
+  },
+  textInputStyle: {
+    backgroundColor: "white",
+    marginHorizontal: 10,
+    height: 40,
+    borderRadius: 10,
+    fontSize: 16
+  },
+  summitButton: {
+    height: 40,
+    width: "100%",
+    backgroundColor: BaseColor.primaryColor,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20
+  },
+  summitText: {
+    color: BaseColor.greyColor,
+    fontSize: 18,
+    color: "white"
   }
 });

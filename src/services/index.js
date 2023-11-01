@@ -1,5 +1,5 @@
 const productionURL = "https://nevoapi.azurewebsites.net";
-const localURL = "http://169.254.227.75:3000";
+const localURL = "http://169.254.173.166:3000";
 // const localURL = "http://localhost:3000";
 
 let currentURLProduction = false;

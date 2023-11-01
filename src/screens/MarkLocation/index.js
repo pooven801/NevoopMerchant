@@ -53,7 +53,7 @@ const MarkLocation = ({ navigation, route }) => {
         }}
       />
       <MapView
-        style={{ height: "100%", width: "100" }}
+        style={{ height: "100%", width: "100%" }}
         initialRegion={initialRegion}
         onMapReady={(res) => {
           // console.log(res);
