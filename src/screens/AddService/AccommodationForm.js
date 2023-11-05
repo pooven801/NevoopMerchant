@@ -16,11 +16,10 @@ import * as Services from "@services";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { Dropdown } from "react-native-element-dropdown";
 
-const FoodForm = (props) => {
+const AccommodationForm = (props) => {
   const authUser = useSelector((state) => state.auth.data);
   const [params, setParams] = useState({
     images: [],
-    minMaxPlateCount: { min: 0, max: 0 },
     locationCoordinate: props.location,
     merchantId: authUser._id
   });
@@ -32,36 +31,19 @@ const FoodForm = (props) => {
   const [imageAutoPlay, setImageAutoPlay] = useState(true);
   const [confirmDeleteModal, setConfirmDeleteModal] = useState(false);
   const [showImgSizeAlert, setShowImgSizeAlert] = useState(false);
-  const [doProvideServant, setDoProvideServant] = useState(null);
   const [currentDeleteImageIndex, setCurrentDeleteImageIndex] = useState(0);
-  const [validTransportPrice, setValidTransportPrice] = useState(true);
-  const [validPlateCount, setValidPlateCount] = useState(true);
   const [validPrice, setValidPrice] = useState(true);
   const [firstRun, setFirstRun] = useState(true);
   const width = Dimensions.get("window").width;
-  const menuTypeItem = [
-    { label: "Full Set", value: "Full Set" },
-    { label: "Alacarte", value: "Alacarte" }
+  const pricePerDayHourItem = [
+    { label: "Day", value: "Day" },
+    { label: "Hour", value: "Hour" }
   ];
-  const provideServantItem = [
-    { label: "Yes", value: "Yes" },
-    { label: "No", value: "No" }
+  const fullSpaceItem = [
+    { label: "Yes", value: true },
+    { label: "No", value: false }
   ];
-  const isHalalItem = [
-    { label: "Yes", value: "Yes" },
-    { label: "No", value: "No" }
-  ];
-  const cuisineData = [
-    { label: "Malay", value: "Malay" },
-    { label: "Chinese", value: "Chinese" },
-    { label: "Indian", value: "Indian" },
-    { label: "Malay-Chinese", value: "Malay-Chinese" },
-    { label: "Malay-Indian", value: "Malay-Indian" },
-    { label: "Sabahan", value: "Sabahan" },
-    { label: "Sarawakian", value: "Sarawakian" },
-    { label: "Peranakan", value: "Peranakan" },
-    { label: "Western", value: "Western" }
-  ];
+
   const { mapOnPress, location, updateParams, checkFormError, submitForm } =
     props;
 
@@ -80,59 +62,19 @@ const FoodForm = (props) => {
         message: "Atleast one service image needed"
       });
     } else if (
-      parseInt(params.minMaxPlateCount.min) >
-      parseInt(params.minMaxPlateCount.max)
-    ) {
-      setShowSubmitStatusModal({
-        show: true,
-        message: "Invalid Plate Count. Min must be less than Max"
-      });
-    } else if (
-      params.minMaxPlateCount.min == "" ||
-      params.minMaxPlateCount.max == ""
-    ) {
-      setShowSubmitStatusModal({
-        show: true,
-        message: "Fill in plate count"
-      });
-    } else if (params?.menuType == undefined) {
-      setShowSubmitStatusModal({
-        show: true,
-        message: "Choose menu type"
-      });
-    } else if (params?.cuisine == undefined) {
-      setShowSubmitStatusModal({
-        show: true,
-        message: "Choose cuisine"
-      });
-    } else if (
-      (doProvideServant !== "No" && params?.provideServant == undefined) ||
-      params?.provideServant?.numberOfServant == "" ||
-      params?.provideServant?.pricePerServant == ""
-    ) {
-      setShowSubmitStatusModal({
-        show: true,
-        message:
-          params?.provideServant == undefined && doProvideServant !== "No"
-            ? "Please choose servant service"
-            : params?.provideServant?.numberOfServant
-            ? "Servant number is empty"
-            : "Servant price is empty"
-      });
-    } else if (params?.isHalal == undefined) {
-      setShowSubmitStatusModal({
-        show: true,
-        message: "Choose halal status"
-      });
-    } else if (
       params?.name == "" ||
       params?.name == undefined ||
       params?.description == "" ||
       params?.description == undefined ||
-      params?.pricePerPlate == "" ||
-      params?.pricePerPlate == undefined ||
+      params?.price == "" ||
+      params?.price == undefined ||
       validPrice == false ||
-      validTransportPrice == false
+      params?.pricePerDayHour == undefined ||
+      params?.fullSpace == undefined ||
+      params?.address?.addressLine1 == "" ||
+      params.address?.addressLine1 == undefined ||
+      params?.address?.addressLine2 == "" ||
+      params.address?.addressLine2 == undefined
     ) {
       setShowSubmitStatusModal({
         show: true,
@@ -141,11 +83,18 @@ const FoodForm = (props) => {
             ? "Fill in name"
             : params?.description == "" || params?.description == undefined
             ? "Fill in description"
-            : params?.pricePerPlate == "" || params?.pricePerPlate == undefined
-            ? "Fill in price per plate"
+            : params?.price == "" || params?.price == undefined
+            ? "Fill in price"
             : validPrice == false
-            ? "Invalid price per plate"
-            : "Invalid transport price"
+            ? "Invalid price"
+            : params?.pricePerDayHour == undefined
+            ? "Choose Price per Day/Hour"
+            : params?.fullSpace == undefined
+            ? "Choose full space or not full space"
+            : params?.address?.addressLine1 == "" ||
+              params.address?.addressLine1 == undefined
+            ? "Address Line 1 is empty"
+            : "Address Line 2 is empty"
       });
     } else {
       submitForm();
@@ -239,211 +188,7 @@ const FoodForm = (props) => {
       >
         <Text style={styles.uploadText}>Upload Image</Text>
       </TouchableOpacity>
-      <Text style={styles.textStyle}>Plate Count Range *</Text>
-      <View style={{ flexDirection: "row", width: "100%" }}>
-        <TextInput
-          onChangeText={(text) => {
-            if (
-              parseInt(text.replace(/[^0-9]/g, "")) >
-              parseInt(params.minMaxPlateCount.max)
-            ) {
-              setValidPlateCount(false);
-            } else {
-              setValidPlateCount(true);
-            }
-            setParams({
-              ...params,
-              minMaxPlateCount: {
-                ...params.minMaxPlateCount,
-                min: text.replace(/[^0-9]/g, "")
-              }
-            });
-          }}
-          placeholder={"Min"}
-          keyboardType={"number-pad"}
-          value={params.minMaxPlateCount.min}
-          style={styles.textInputHalfStyle}
-        />
-        <TextInput
-          onChangeText={(text) => {
-            if (
-              parseInt(params.minMaxPlateCount.min) >
-              parseInt(text.replace(/[^0-9]/g, ""))
-            ) {
-              setValidPlateCount(false);
-            } else {
-              setValidPlateCount(true);
-            }
-            setParams({
-              ...params,
-              minMaxPlateCount: {
-                ...params.minMaxPlateCount,
-                max: text.replace(/[^0-9]/g, "")
-              }
-            });
-          }}
-          value={params.minMaxPlateCount.max}
-          placeholder={"Max"}
-          keyboardType={"number-pad"}
-          style={styles.textInputHalfStyle}
-        />
-      </View>
-      {validPlateCount == false && (
-        <Text
-          style={[styles.textStyle, { color: "red", top: -10, fontSize: 14 }]}
-        >
-          Min must be more than Max
-        </Text>
-      )}
-      <Text style={styles.textStyle}>Menu Type *</Text>
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={menuTypeItem}
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder="Select item"
-        searchPlaceholder="Search..."
-        value={params.menuType}
-        onChange={(item) => {
-          setParams({
-            ...params,
-            menuType: item.value
-          });
-        }}
-        renderItem={renderItem}
-      />
-      <Text style={styles.textStyle}>Choose Cuisine *</Text>
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={cuisineData}
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder="Select"
-        searchPlaceholder="Search..."
-        value={params.cuisine}
-        onChange={(item) => {
-          setParams({
-            ...params,
-            cuisine: item.value
-          });
-        }}
-        renderItem={renderItem}
-      />
-      <Text style={styles.textStyle}>Provide Servant *</Text>
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={provideServantItem}
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder="Select"
-        searchPlaceholder="Search..."
-        value={doProvideServant}
-        onChange={(item) => {
-          if (item.value == "No") {
-            setParams((current) => {
-              const { provideServant, ...rest } = current;
-              return rest;
-            });
-            setDoProvideServant(item.value);
-          } else {
-            setParams({
-              ...params,
-              provideServant: {
-                numberOfServant: "",
-                pricePerServant: ""
-              }
-            });
-            setDoProvideServant(item.value);
-          }
-        }}
-        renderItem={renderItem}
-      />
-      {doProvideServant == "Yes" && (
-        <View>
-          <Text style={styles.textStyle}>Number Of Servants</Text>
-          <TextInput
-            onChangeText={(text) =>
-              setParams({
-                ...params,
-                provideServant: {
-                  ...params.provideServant,
-                  numberOfServant: text.replace(/[^0-9]/g, "")
-                }
-              })
-            }
-            value={params?.provideServant?.numberOfServant}
-            placeholder={"Number Of Servants"}
-            style={styles.textInputStyle}
-            keyboardType={"number-pad"}
-          />
-          <Text style={styles.textStyle}>Price Per Servant (Hourly)</Text>
-          <TextInput
-            onChangeText={(text) =>
-              setParams({
-                ...params,
-                provideServant: {
-                  ...params.provideServant,
-                  pricePerServant: text.replace(/[^0-9]/g, "")
-                }
-              })
-            }
-            value={params?.provideServant?.pricePerServant}
-            placeholder={" Price Per Servant (Hourly)"}
-            style={styles.textInputStyle}
-            keyboardType={"number-pad"}
-          />
-        </View>
-      )}
-      <Text style={styles.textStyle}>Product Halal? *</Text>
-      <Dropdown
-        style={styles.dropdown}
-        placeholderStyle={styles.placeholderStyle}
-        selectedTextStyle={styles.selectedTextStyle}
-        inputSearchStyle={styles.inputSearchStyle}
-        iconStyle={styles.iconStyle}
-        data={isHalalItem}
-        maxHeight={300}
-        labelField="label"
-        valueField="value"
-        placeholder="Select"
-        searchPlaceholder="Search..."
-        value={params.isHalal}
-        onChange={(item) => {
-          setParams({
-            ...params,
-            isHalal: item.value
-          });
-        }}
-        renderItem={renderItem}
-      />
-      <Text style={styles.textStyle}>Video Link</Text>
-      <TextInput
-        onChangeText={(text) =>
-          setParams({
-            ...params,
-            videoLink: text
-          })
-        }
-        value={params?.videoLink}
-        placeholder={"Video Link"}
-        style={styles.textInputStyle}
-      />
-      <Text style={styles.textStyle}>Food Name *</Text>
+      <Text style={styles.textStyle}>Accommodation Name *</Text>
       <TextInput
         onChangeText={(text) =>
           setParams({
@@ -452,7 +197,7 @@ const FoodForm = (props) => {
           })
         }
         value={params?.name}
-        placeholder={"Food Name"}
+        placeholder={"Accommodation Name"}
         style={styles.textInputStyle}
       />
       <Text style={styles.textStyle}>Description *</Text>
@@ -474,7 +219,7 @@ const FoodForm = (props) => {
           }
         ]}
       />
-      <Text style={styles.textStyle}>Price Per Plate *</Text>
+      <Text style={styles.textStyle}>Price *</Text>
       <TextInput
         onChangeText={(text) => {
           if (/^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/.test(text) == true) {
@@ -484,20 +229,76 @@ const FoodForm = (props) => {
           }
           setParams({
             ...params,
-            pricePerPlate: text.replace(/[^0-9.]/g, "")
+            price: text.replace(/[^0-9.]/g, "")
           });
         }}
-        value={params?.pricePerPlate}
-        placeholder={"Price Per Plate"}
+        value={params?.price}
+        placeholder={"Price"}
         style={styles.textInputStyle}
       />
-      {validPrice == false && params?.pricePerPlate != "" && (
+      {validPrice == false && params.price != "" && (
         <Text
           style={[styles.textStyle, { color: "red", top: -10, fontSize: 14 }]}
         >
           Invalid Price Format (Must be in Currency Format)
         </Text>
       )}
+      <Text style={styles.textStyle}>Price per Day/Hour *</Text>
+      <Dropdown
+        style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={pricePerDayHourItem}
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder="Select"
+        searchPlaceholder="Search..."
+        value={params.pricePerDayHour}
+        onChange={(item) => {
+          setParams({
+            ...params,
+            pricePerDayHour: item.value
+          });
+        }}
+        renderItem={renderItem}
+      />
+      <Text style={styles.textStyle}>Full Space ? *</Text>
+      <Dropdown
+        style={styles.dropdown}
+        placeholderStyle={styles.placeholderStyle}
+        selectedTextStyle={styles.selectedTextStyle}
+        inputSearchStyle={styles.inputSearchStyle}
+        iconStyle={styles.iconStyle}
+        data={fullSpaceItem}
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder="Select"
+        searchPlaceholder="Search..."
+        value={params.fullSpace}
+        onChange={(item) => {
+          setParams({
+            ...params,
+            fullSpace: item.value
+          });
+        }}
+        renderItem={renderItem}
+      />
+      <Text style={styles.textStyle}>Video Link</Text>
+      <TextInput
+        onChangeText={(text) =>
+          setParams({
+            ...params,
+            videoLink: text
+          })
+        }
+        value={params?.videoLink}
+        placeholder={"Video Link"}
+        style={styles.textInputStyle}
+      />
       <Text style={styles.textStyle}>
         Service Location (Default Current Location) *
       </Text>
@@ -518,36 +319,30 @@ const FoodForm = (props) => {
             : `Latitude: ${location.latitude}, Longitude: ${location.longitude}`}
         </Text>
       </TouchableOpacity>
-      <Text style={styles.textStyle}>Transport Price Per KM(RM)</Text>
+      <Text style={styles.textStyle}>Address Line 1 *</Text>
       <TextInput
-        onChangeText={(text) => {
-          if (/^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/.test(text) == true) {
-            setValidTransportPrice(true);
-          } else if (text !== "") {
-            setValidTransportPrice(false);
-          }
+        onChangeText={(text) =>
           setParams({
             ...params,
-            transportPrice: text.replace(/[^0-9.]/g, "")
-          });
-        }}
-        value={params?.transportPrice}
-        placeholder={"Transport Price Per KM(RM)"}
-        style={[
-          styles.textInputStyle,
-          validTransportPrice == true && { marginBottom: 50 }
-        ]}
+            address: { ...params?.address, addressLine1: text }
+          })
+        }
+        value={params?.address?.addressLine1}
+        placeholder={"Address Line 1"}
+        style={styles.textInputStyle}
       />
-      {validTransportPrice == false && (
-        <Text
-          style={[
-            styles.textStyle,
-            { marginBottom: 50, color: "red", top: -10, fontSize: 14 }
-          ]}
-        >
-          Invalid Price Format (Must be in Currency Format)
-        </Text>
-      )}
+      <Text style={styles.textStyle}>Address Line 2 *</Text>
+      <TextInput
+        onChangeText={(text) =>
+          setParams({
+            ...params,
+            address: { ...params?.address, addressLine2: text }
+          })
+        }
+        value={params?.address?.addressLine2}
+        placeholder={"Address Line 2"}
+        style={[styles.textInputStyle, { marginBottom: 50 }]}
+      />
       <CustomModal
         title={"Confirm"}
         cancelOnPress={() => {
@@ -721,4 +516,4 @@ const FoodForm = (props) => {
   );
 };
 
-export default FoodForm;
+export default AccommodationForm;

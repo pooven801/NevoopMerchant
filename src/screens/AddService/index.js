@@ -17,6 +17,7 @@ import * as AuthAction from "@actions/AuthAction";
 import { CustomStatusBar, Header, CustomModal } from "@components";
 import { BaseColor } from "@config";
 import FoodForm from "./FoodForm";
+import AccommodationForm from "./AccommodationForm";
 import MarkLocation from "../MarkLocation";
 import GetLocation from "react-native-get-location";
 import * as Services from "@services";
@@ -25,9 +26,10 @@ import { Dropdown } from "react-native-element-dropdown";
 // import { useSelector } from "react-redux";
 
 const AddService = ({ navigation }) => {
-  const [params, setParams] = useState({ email: "", pwd: "" });
+  const [params, setParams] = useState();
   const [currentServiceType, setCurrentServiceType] = useState("Food");
   const [checkFormError, setCheckFormError] = useState(false);
+  const [serverError, setServerError] = useState(false);
   const [showSubmitStatusModal, setShowSubmitStatusModal] = useState({
     show: false,
     message: ""
@@ -137,6 +139,7 @@ const AddService = ({ navigation }) => {
           message: res.message
         });
       } else {
+        setServerError(true);
         setShowSubmitStatusModal({
           show: true,
           message: res.message
@@ -209,23 +212,42 @@ const AddService = ({ navigation }) => {
           }}
           renderItem={renderItem}
         />
-        <FoodForm
-          location={markedCoordinate}
-          mapOnPress={() => {
-            navigation.navigate("MarkLocation", {
-              updateLocation: locationCallback,
-              markedCoordinate: markedCoordinate
-            });
-          }}
-          updateParams={(res) => {
-            console.log(res);
-            setParams(res);
-          }}
-          checkFormError={checkFormError}
-          submitForm={submitForm}
-        />
+        {currentServiceType == "Food" && (
+          <FoodForm
+            location={markedCoordinate}
+            mapOnPress={() => {
+              navigation.navigate("MarkLocation", {
+                updateLocation: locationCallback,
+                markedCoordinate: markedCoordinate
+              });
+            }}
+            updateParams={(res) => {
+              console.log(res);
+              setParams(res);
+            }}
+            checkFormError={checkFormError}
+            submitForm={submitForm}
+          />
+        )}
+        {currentServiceType == "Accommodation" && (
+          <AccommodationForm
+            location={markedCoordinate}
+            mapOnPress={() => {
+              navigation.navigate("MarkLocation", {
+                updateLocation: locationCallback,
+                markedCoordinate: markedCoordinate
+              });
+            }}
+            updateParams={(res) => {
+              console.log(res);
+              setParams(res);
+            }}
+            checkFormError={checkFormError}
+            submitForm={submitForm}
+          />
+        )}
         <CustomModal
-          title={"Service"}
+          title={"Submit"}
           buttonText={"Ok"}
           subTitle={"Status"}
           show={showSubmitStatusModal.show}
@@ -245,6 +267,10 @@ const AddService = ({ navigation }) => {
                   show: false,
                   message: ""
                 });
+                if (serverError == true) {
+                  setServerError(false);
+                  return;
+                }
                 navigation.navigate("Home");
               }}
             >
