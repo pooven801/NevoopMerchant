@@ -129,6 +129,22 @@ const AddService = ({ navigation }) => {
     console.log(res);
   };
 
+  const submitForm = () => {
+    Services.createServices(params, API_SERVICE_TYPE).then((res) => {
+      if (res?.success) {
+        setShowSubmitStatusModal({
+          show: true,
+          message: res.message
+        });
+      } else {
+        setShowSubmitStatusModal({
+          show: true,
+          message: res.message
+        });
+      }
+    });
+  };
+
   return (
     <View style={styles.mainContainer}>
       <CustomStatusBar
@@ -206,6 +222,7 @@ const AddService = ({ navigation }) => {
             setParams(res);
           }}
           checkFormError={checkFormError}
+          submitForm={submitForm}
         />
         <CustomModal
           title={"Service"}

@@ -63,7 +63,8 @@ const FoodForm = (props) => {
     { label: "Peranakan", value: "Peranakan" },
     { label: "Western", value: "Western" }
   ];
-  const { mapOnPress, location, updateParams, checkFormError } = props;
+  const { mapOnPress, location, updateParams, checkFormError, submitForm } =
+    props;
 
   useEffect(() => {
     updateParams(params);
@@ -74,7 +75,7 @@ const FoodForm = (props) => {
       setFirstRun(false);
       return;
     }
-    console.log("Check PARAMS_ERR", params?.provideServant);
+    console.log("Check PARAMS_ERRx", params?.description?.length);
     if (params.images.length == 0) {
       console.log(
         "ERRx",
@@ -111,14 +112,14 @@ const FoodForm = (props) => {
         message: "Choose cuisine"
       });
     } else if (
-      params?.provideServant == undefined ||
+      (doProvideServant !== "No" && params?.provideServant == undefined) ||
       params?.provideServant?.numberOfServant == "" ||
       params?.provideServant?.pricePerServant == ""
     ) {
       setShowSubmitStatusModal({
         show: true,
         message:
-          params?.provideServant == undefined
+          params?.provideServant == undefined && doProvideServant !== "No"
             ? "Please choose servant service"
             : params?.provideServant?.numberOfServant
             ? "Servant number is empty"
@@ -130,31 +131,33 @@ const FoodForm = (props) => {
         message: "Choose halal status"
       });
     } else if (
-      params?.provideServant?.videoLink == "" ||
-      params?.provideServant?.name == "" ||
-      params?.provideServant?.description == "" ||
-      params?.provideServant?.pricePerPlate == "" ||
-      validPlateCount == false ||
-      params?.provideServant?.transportPrice == "" ||
+      params?.name == "" ||
+      params?.name == undefined ||
+      params?.description == "" ||
+      params?.description == undefined ||
+      params?.pricePerPlate == "" ||
+      params?.pricePerPlate == undefined ||
+      validPrice == false ||
+      params?.transportPrice == "" ||
       validTransportPrice == false
     ) {
       setShowSubmitStatusModal({
         show: true,
         message:
-          params?.provideServant?.videoLink == ""
-            ? "Fill in video link"
-            : params?.provideServant?.name
+          params?.name == "" || params?.name == undefined
             ? "Fill in name"
-            : params?.provideServant?.description
+            : params?.description == "" || params?.description == undefined
             ? "Fill in description"
-            : params?.provideServant?.pricePerPlate == ""
+            : params?.pricePerPlate == "" || params?.pricePerPlate == undefined
             ? "Fill in price per plate"
-            : validPlateCount == false
+            : validPrice == false
             ? "Invalid price per plate"
             : params?.provideServant?.transportPrice == ""
             ? "Fill in transport price"
             : "Invalid transport price"
       });
+    } else {
+      submitForm();
     }
   }, [checkFormError]);
 
@@ -206,7 +209,7 @@ const FoodForm = (props) => {
             width={width}
             pagingEnabled
             height={240}
-            autoPlay={imageAutoPlay}
+            autoPlay={params?.images.length > 1}
             data={params?.images}
             scrollAnimationDuration={1000}
             renderItem={({ index, item }) => (
@@ -243,11 +246,14 @@ const FoodForm = (props) => {
       >
         <Text style={styles.uploadText}>Upload Image</Text>
       </TouchableOpacity>
-      <Text style={styles.textStyle}>Plate Count</Text>
+      <Text style={styles.textStyle}>Plate Count Range *</Text>
       <View style={{ flexDirection: "row", width: "100%" }}>
         <TextInput
           onChangeText={(text) => {
-            if (text.replace(/[^0-9]/g, "") > params.minMaxPlateCount.max) {
+            if (
+              parseInt(text.replace(/[^0-9]/g, "")) >
+              parseInt(params.minMaxPlateCount.max)
+            ) {
               setValidPlateCount(false);
             } else {
               setValidPlateCount(true);
@@ -272,7 +278,10 @@ const FoodForm = (props) => {
               text.replace(/[^0-9]/g, ""),
               params.minMaxPlateCount.min > text.replace(/[^0-9]/g, "")
             );
-            if (params.minMaxPlateCount.min > text.replace(/[^0-9]/g, "")) {
+            if (
+              parseInt(params.minMaxPlateCount.min) >
+              parseInt(text.replace(/[^0-9]/g, ""))
+            ) {
               setValidPlateCount(false);
             } else {
               setValidPlateCount(true);
@@ -298,7 +307,7 @@ const FoodForm = (props) => {
           Min must be more than Max
         </Text>
       )}
-      <Text style={styles.textStyle}>Menu Type</Text>
+      <Text style={styles.textStyle}>Menu Type *</Text>
       <Dropdown
         style={styles.dropdown}
         placeholderStyle={styles.placeholderStyle}
@@ -320,7 +329,7 @@ const FoodForm = (props) => {
         }}
         renderItem={renderItem}
       />
-      <Text style={styles.textStyle}>Choose Cuisine</Text>
+      <Text style={styles.textStyle}>Choose Cuisine *</Text>
       <Dropdown
         style={styles.dropdown}
         placeholderStyle={styles.placeholderStyle}
@@ -342,7 +351,7 @@ const FoodForm = (props) => {
         }}
         renderItem={renderItem}
       />
-      <Text style={styles.textStyle}>Provide Servant</Text>
+      <Text style={styles.textStyle}>Provide Servant *</Text>
       <Dropdown
         style={styles.dropdown}
         placeholderStyle={styles.placeholderStyle}
@@ -358,16 +367,12 @@ const FoodForm = (props) => {
         value={doProvideServant}
         onChange={(item) => {
           if (item.value == "No") {
-            setParams({
-              ...params,
-              provideServant: {
-                numberOfServant: "",
-                pricePerServant: ""
-              }
+            setParams((current) => {
+              const { provideServant, ...rest } = current;
+              return rest;
             });
-            setDoProvideServant(null);
-          } else {
             setDoProvideServant(item.value);
+          } else {
             setParams({
               ...params,
               provideServant: {
@@ -375,6 +380,7 @@ const FoodForm = (props) => {
                 pricePerServant: ""
               }
             });
+            setDoProvideServant(item.value);
           }
         }}
         renderItem={renderItem}
@@ -415,7 +421,7 @@ const FoodForm = (props) => {
           />
         </View>
       )}
-      <Text style={styles.textStyle}>Product Halal?</Text>
+      <Text style={styles.textStyle}>Product Halal? *</Text>
       <Dropdown
         style={styles.dropdown}
         placeholderStyle={styles.placeholderStyle}
@@ -449,7 +455,7 @@ const FoodForm = (props) => {
         placeholder={"Video Link"}
         style={styles.textInputStyle}
       />
-      <Text style={styles.textStyle}>Food Name</Text>
+      <Text style={styles.textStyle}>Food Name *</Text>
       <TextInput
         onChangeText={(text) =>
           setParams({
@@ -461,7 +467,7 @@ const FoodForm = (props) => {
         placeholder={"Food Name"}
         style={styles.textInputStyle}
       />
-      <Text style={styles.textStyle}>Description</Text>
+      <Text style={styles.textStyle}>Description *</Text>
       <TextInput
         onChangeText={(text) =>
           setParams({
@@ -480,7 +486,7 @@ const FoodForm = (props) => {
           }
         ]}
       />
-      <Text style={styles.textStyle}>Price Per Plate</Text>
+      <Text style={styles.textStyle}>Price Per Plate *</Text>
       <TextInput
         onChangeText={(text) => {
           if (/^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/.test(text) == true) {
@@ -505,7 +511,7 @@ const FoodForm = (props) => {
         </Text>
       )}
       <Text style={styles.textStyle}>
-        Service Location (Default Current Location)
+        Service Location (Default Current Location) *
       </Text>
       <TouchableOpacity
         style={{
