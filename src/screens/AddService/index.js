@@ -22,6 +22,9 @@ import VanueForm from "./VanueForm";
 import BeautyHealthForm from "./BeautyHealthForm";
 import PhotographerForm from "./PhotographerForm";
 import TransportationLogisticForm from "./TransportationLogisticForm";
+import DecorationForm from "./DecorationForm";
+import DesignerForm from "./DesignerForm";
+import MultimediaForm from "./MultimediaForm";
 import MarkLocation from "../MarkLocation";
 import GetLocation from "react-native-get-location";
 import * as Services from "@services";
@@ -303,6 +306,57 @@ const AddService = ({ navigation }) => {
         )}
         {currentServiceType == "Transportation/Logistic" && (
           <TransportationLogisticForm
+            location={markedCoordinate}
+            mapOnPress={() => {
+              navigation.navigate("MarkLocation", {
+                updateLocation: locationCallback,
+                markedCoordinate: markedCoordinate
+              });
+            }}
+            updateParams={(res) => {
+              console.log(res);
+              setParams(res);
+            }}
+            checkFormError={checkFormError}
+            submitForm={submitForm}
+          />
+        )}
+        {currentServiceType == "Decoration" && (
+          <DecorationForm
+            location={markedCoordinate}
+            mapOnPress={() => {
+              navigation.navigate("MarkLocation", {
+                updateLocation: locationCallback,
+                markedCoordinate: markedCoordinate
+              });
+            }}
+            updateParams={(res) => {
+              console.log(res);
+              setParams(res);
+            }}
+            checkFormError={checkFormError}
+            submitForm={submitForm}
+          />
+        )}
+        {currentServiceType == "Designer" && (
+          <DesignerForm
+            location={markedCoordinate}
+            mapOnPress={() => {
+              navigation.navigate("MarkLocation", {
+                updateLocation: locationCallback,
+                markedCoordinate: markedCoordinate
+              });
+            }}
+            updateParams={(res) => {
+              console.log(res);
+              setParams(res);
+            }}
+            checkFormError={checkFormError}
+            submitForm={submitForm}
+          />
+        )}
+        {currentServiceType == "Multimedia" && (
+          <MultimediaForm
             location={markedCoordinate}
             mapOnPress={() => {
               navigation.navigate("MarkLocation", {

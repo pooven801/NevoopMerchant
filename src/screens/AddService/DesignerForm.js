@@ -14,8 +14,9 @@ import { BaseColor, Images } from "@config";
 import Carousel from "react-native-reanimated-carousel";
 import * as Services from "@services";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import { Dropdown } from "react-native-element-dropdown";
 
-const BeautyHealthForm = (props) => {
+const DesignerForm = (props) => {
   const authUser = useSelector((state) => state.auth.data);
   const [params, setParams] = useState({
     images: [],
@@ -35,6 +36,17 @@ const BeautyHealthForm = (props) => {
   const [validPrice, setValidPrice] = useState(true);
   const [firstRun, setFirstRun] = useState(true);
   const width = Dimensions.get("window").width;
+
+  const typeItem = [
+    { label: "Car", value: "Car" },
+    { label: "Bus", value: "Bus" },
+    { label: "Pickup (4x4)", value: "Pickup (4x4)" },
+    { label: "Van 7-ft", value: "Van 7-ft" },
+    { label: "Large Van 9-ft", value: "Large Van 9-ft" },
+    { label: "Small Lorry 10-ft", value: "Small Lorry 10-ft" },
+    { label: "Medium Lorry 14-ft", value: "Medium Lorry 14-ft" },
+    { label: "Large Lorry 20-ft", value: "Large Lorry 20-ft" }
+  ];
 
   const { mapOnPress, location, updateParams, checkFormError, submitForm } =
     props;
@@ -473,4 +485,4 @@ const BeautyHealthForm = (props) => {
   );
 };
 
-export default BeautyHealthForm;
+export default DesignerForm;

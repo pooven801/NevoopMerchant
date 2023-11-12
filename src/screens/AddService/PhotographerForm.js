@@ -76,6 +76,17 @@ const PhotographerForm = (props) => {
             ? "Invalid price"
             : "Invalid transport price"
       });
+    } else if (
+      params?.videoLink != undefined &&
+      params?.videoLink != "" &&
+      matchYoutubeUrl(params?.videoLink) == false
+    ) {
+      setShowSubmitStatusModal({
+        show: true,
+        message: "Invalid Youtube video"
+      });
+    } else if (params?.videoLink == "") {
+      delete params.videoLink;
     } else {
       submitForm();
     }
@@ -106,6 +117,18 @@ const PhotographerForm = (props) => {
     Services.storeBlobGetURL({ file: newImageBase64 }).then((res) => {
       setParams({ ...params, images: [...params.images, res.urlLink] });
     });
+  };
+
+  const matchYoutubeUrl = (url) => {
+    var p =
+      /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+    if (url.match(p)) {
+      console.log(url.match(p)[1]);
+      return true;
+      //   return url.match(p)[1];
+    }
+    console.log(false);
+    return false;
   };
 
   return (
@@ -215,7 +238,7 @@ const PhotographerForm = (props) => {
           Invalid Price Format (Must be in Currency Format)
         </Text>
       )}
-      <Text style={styles.textStyle}>Video Link</Text>
+      <Text style={styles.textStyle}>Video Link (Youtube Video Only)</Text>
       <TextInput
         onChangeText={(text) =>
           setParams({

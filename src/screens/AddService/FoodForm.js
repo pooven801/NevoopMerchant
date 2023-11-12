@@ -147,6 +147,17 @@ const FoodForm = (props) => {
             ? "Invalid price per plate"
             : "Invalid transport price"
       });
+    } else if (
+      params?.videoLink != undefined &&
+      params?.videoLink != "" &&
+      matchYoutubeUrl(params?.videoLink) == false
+    ) {
+      setShowSubmitStatusModal({
+        show: true,
+        message: "Invalid Youtube video"
+      });
+    } else if (params?.videoLink == "") {
+      delete params.videoLink;
     } else {
       submitForm();
     }
@@ -185,6 +196,18 @@ const FoodForm = (props) => {
         <Text style={styles.textItem}>{item.label}</Text>
       </View>
     );
+  };
+
+  const matchYoutubeUrl = (url) => {
+    var p =
+      /^(?:https?:\/\/)?(?:m\.|www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+    if (url.match(p)) {
+      console.log(url.match(p)[1]);
+      return true;
+      //   return url.match(p)[1];
+    }
+    console.log(false);
+    return false;
   };
 
   return (
@@ -431,7 +454,7 @@ const FoodForm = (props) => {
         }}
         renderItem={renderItem}
       />
-      <Text style={styles.textStyle}>Video Link</Text>
+      <Text style={styles.textStyle}>Video Link (Youtube Video Only)</Text>
       <TextInput
         onChangeText={(text) =>
           setParams({
