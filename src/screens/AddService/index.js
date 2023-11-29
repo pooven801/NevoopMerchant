@@ -25,6 +25,8 @@ import TransportationLogisticForm from "./TransportationLogisticForm";
 import DecorationForm from "./DecorationForm";
 import DesignerForm from "./DesignerForm";
 import MultimediaForm from "./MultimediaForm";
+import VideoRecorderForm from "./VideoRecorderForm";
+import OthersForm from "./OthersForm";
 import MarkLocation from "../MarkLocation";
 import GetLocation from "react-native-get-location";
 import * as Services from "@services";
@@ -357,6 +359,40 @@ const AddService = ({ navigation }) => {
         )}
         {currentServiceType == "Multimedia" && (
           <MultimediaForm
+            location={markedCoordinate}
+            mapOnPress={() => {
+              navigation.navigate("MarkLocation", {
+                updateLocation: locationCallback,
+                markedCoordinate: markedCoordinate
+              });
+            }}
+            updateParams={(res) => {
+              console.log(res);
+              setParams(res);
+            }}
+            checkFormError={checkFormError}
+            submitForm={submitForm}
+          />
+        )}
+        {currentServiceType == "Video Recorder" && (
+          <VideoRecorderForm
+            location={markedCoordinate}
+            mapOnPress={() => {
+              navigation.navigate("MarkLocation", {
+                updateLocation: locationCallback,
+                markedCoordinate: markedCoordinate
+              });
+            }}
+            updateParams={(res) => {
+              console.log(res);
+              setParams(res);
+            }}
+            checkFormError={checkFormError}
+            submitForm={submitForm}
+          />
+        )}
+        {currentServiceType == "Others" && (
+          <OthersForm
             location={markedCoordinate}
             mapOnPress={() => {
               navigation.navigate("MarkLocation", {
