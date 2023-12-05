@@ -7,6 +7,7 @@ import Registration from "@screens/Registration";
 import Home from "@screens/Home";
 import AddService from "@screens/AddService";
 import MarkLocation from "@screens/MarkLocation";
+import ServiceList from "@screens/ServiceList";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -48,6 +49,7 @@ export default function Entry() {
       <Stack.Screen name="Registration" component={Registration} />
       <Stack.Screen name="AddService" component={AddService} />
       <Stack.Screen name="MarkLocation" component={MarkLocation} />
+      <Stack.Screen name="ServiceList" component={ServiceList} />
     </Stack.Navigator>
   );
 }

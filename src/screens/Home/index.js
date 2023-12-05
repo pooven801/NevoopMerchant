@@ -131,7 +131,11 @@ const Home = ({ navigation }) => {
                 backgroundColor: BaseColor.primaryColor
               }}
               onPress={() => {
-                navigation.navigate("AddService");
+                if (index == 0) {
+                  navigation.navigate("AddService");
+                } else if (index == 1) {
+                  navigation.navigate("ServiceList");
+                }
               }}
             >
               {index == 0 && (

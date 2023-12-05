@@ -122,24 +122,6 @@ const AddService = ({ navigation }) => {
     );
   };
 
-  const onPressSummit = (res) => {
-    setCheckFormError(!checkFormError);
-    // Services.createServices(params, API_SERVICE_TYPE).then((res) => {
-    //   if (res?.success) {
-    //     setShowSubmitStatusModal({
-    //       show: true,
-    //       message: res.message
-    //     });
-    //   } else {
-    //     setShowSubmitStatusModal({
-    //       show: true,
-    //       message: res.message
-    //     });
-    //   }
-    // });
-    console.log(res);
-  };
-
   const submitForm = () => {
     Services.createServices(params, API_SERVICE_TYPE).then((res) => {
       if (res?.success) {
@@ -185,8 +167,6 @@ const AddService = ({ navigation }) => {
           navigation.goBack();
         }}
         onPressRight={() => {
-          // callRegisterMerchant();
-          // onPressSummit();
           setCheckFormError(!checkFormError);
         }}
         renderRight={() => {

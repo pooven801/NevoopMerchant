@@ -63,14 +63,14 @@ export async function createServices(params, formType) {
   }).then((data) => data.json());
 }
 
-export async function getServiceList(pagination, serviceType) {
+export async function getServiceList(pagination, serviceType, merchantId) {
   console.log(
     finalURL +
-      `/service/${serviceType}?pageNum=${pagination?.pagination?.pageNum}&docPerPage=${pagination.pagination?.docPerPage}`
+      `/service/${serviceType}?pageNum=${pagination?.pagination?.pageNum}&docPerPage=${pagination.pagination?.docPerPage}&merchantIdApp=${merchantId}`
   );
   return fetch(
     finalURL +
-      `/service/${serviceType}?pageNum=${pagination?.pagination?.pageNum}&docPerPage=${pagination.pagination?.docPerPage}`,
+      `/service/${serviceType}?pageNum=${pagination?.pagination?.pageNum}&docPerPage=${pagination.pagination?.docPerPage}&merchantIdApp=${merchantId}`,
     {
       method: "GET",
       headers: {
@@ -78,6 +78,17 @@ export async function getServiceList(pagination, serviceType) {
       }
     }
   ).then((data) => data.json());
+}
+
+export async function searchService(serviceType, params) {
+  console.log(finalURL + `/service/${serviceType}`, params);
+  return fetch(finalURL + `/service/${serviceType}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(params)
+  }).then((data) => data.json());
 }
 
 //Regional End
