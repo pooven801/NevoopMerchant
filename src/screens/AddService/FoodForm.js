@@ -32,7 +32,7 @@ const FoodForm = (props) => {
   const [imageAutoPlay, setImageAutoPlay] = useState(true);
   const [confirmDeleteModal, setConfirmDeleteModal] = useState(false);
   const [showImgSizeAlert, setShowImgSizeAlert] = useState(false);
-  const [doProvideServant, setDoProvideServant] = useState(null);
+  const [doProvideServant, setDoProvideServant] = useState("No");
   const [currentDeleteImageIndex, setCurrentDeleteImageIndex] = useState(0);
   const [validTransportPrice, setValidTransportPrice] = useState(true);
   const [validPlateCount, setValidPlateCount] = useState(true);
@@ -72,13 +72,19 @@ const FoodForm = (props) => {
   } = props;
 
   useEffect(() => {
-    const { provideServant, ...rest } = editParams;
-    if (editParams?.provideServant !== undefined) {
-      setDoProvideServant("Yes");
-      setParams(editParams);
-    } else {
-      setDoProvideServant("No");
-      setParams(rest);
+    if (editParams != null) {
+      const { provideServant, ...rest } = editParams;
+      if (
+        editParams?.provideServant?.numberOfServant !== "" &&
+        editParams?.provideServant?.pricePerServant !== ""
+      ) {
+        setDoProvideServant("Yes");
+        setParams(editParams);
+      } else {
+        setDoProvideServant("No");
+        console.log(rest, "RESTSEX");
+        setParams(rest);
+      }
     }
   }, []);
 
@@ -123,16 +129,16 @@ const FoodForm = (props) => {
         message: "Choose cuisine"
       });
     } else if (
-      (doProvideServant !== "No" && params?.provideServant == undefined) ||
-      params?.provideServant?.numberOfServant == "" ||
-      params?.provideServant?.pricePerServant == ""
+      doProvideServant == "Yes" &&
+      (params?.provideServant?.numberOfServant == "" ||
+        params?.provideServant?.pricePerServant == "")
     ) {
       setShowSubmitStatusModal({
         show: true,
         message:
           params?.provideServant == undefined && doProvideServant !== "No"
             ? "Please choose servant service"
-            : params?.provideServant?.numberOfServant
+            : params?.provideServant?.numberOfServant == ""
             ? "Servant number is empty"
             : "Servant price is empty"
       });
@@ -381,7 +387,7 @@ const FoodForm = (props) => {
         }}
         renderItem={renderItem}
       />
-      <Text style={styles.textStyle}>Provide Servant *</Text>
+      <Text style={styles.textStyle}>Provide Servant</Text>
       <Dropdown
         style={styles.dropdown}
         placeholderStyle={styles.placeholderStyle}
