@@ -48,8 +48,18 @@ const DesignerForm = (props) => {
     { label: "Large Lorry 20-ft", value: "Large Lorry 20-ft" }
   ];
 
-  const { mapOnPress, location, updateParams, checkFormError, submitForm } =
-    props;
+  const {
+    mapOnPress,
+    location,
+    updateParams,
+    checkFormError,
+    submitForm,
+    editParams
+  } = props;
+
+  useEffect(() => {
+    setParams(editParams);
+  }, []);
 
   useEffect(() => {
     updateParams(params);
@@ -97,15 +107,18 @@ const DesignerForm = (props) => {
         show: true,
         message: "Invalid Youtube video"
       });
-    } else if (params?.videoLink == "") {
-      delete params.videoLink;
     } else {
+      if (params?.videoLink == "") delete params.videoLink;
       submitForm();
     }
   }, [checkFormError]);
 
   useEffect(() => {
-    setParams({ ...params, locationCoordinate: props.location });
+    if (editParams == null) {
+      setParams({ ...params, locationCoordinate: props.location });
+    } else {
+      setParams({ ...editParams, locationCoordinate: props.location });
+    }
   }, [location]);
 
   const handleFileUpload = async (imgBase64) => {

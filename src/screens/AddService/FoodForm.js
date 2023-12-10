@@ -62,8 +62,25 @@ const FoodForm = (props) => {
     { label: "Peranakan", value: "Peranakan" },
     { label: "Western", value: "Western" }
   ];
-  const { mapOnPress, location, updateParams, checkFormError, submitForm } =
-    props;
+  const {
+    mapOnPress,
+    location,
+    updateParams,
+    checkFormError,
+    submitForm,
+    editParams
+  } = props;
+
+  useEffect(() => {
+    const { provideServant, ...rest } = editParams;
+    if (editParams?.provideServant !== undefined) {
+      setDoProvideServant("Yes");
+      setParams(editParams);
+    } else {
+      setDoProvideServant("No");
+      setParams(rest);
+    }
+  }, []);
 
   useEffect(() => {
     updateParams(params);
@@ -156,15 +173,18 @@ const FoodForm = (props) => {
         show: true,
         message: "Invalid Youtube video"
       });
-    } else if (params?.videoLink == "") {
-      delete params.videoLink;
     } else {
+      if (params?.videoLink == "") delete params.videoLink;
       submitForm();
     }
   }, [checkFormError]);
 
   useEffect(() => {
-    setParams({ ...params, locationCoordinate: props.location });
+    if (editParams == null) {
+      setParams({ ...params, locationCoordinate: props.location });
+    } else {
+      setParams({ ...editParams, locationCoordinate: props.location });
+    }
   }, [location]);
 
   const handleFileUpload = async (imgBase64) => {
@@ -206,7 +226,6 @@ const FoodForm = (props) => {
       return true;
       //   return url.match(p)[1];
     }
-    console.log(false);
     return false;
   };
 
@@ -284,7 +303,7 @@ const FoodForm = (props) => {
           }}
           placeholder={"Min"}
           keyboardType={"number-pad"}
-          value={params.minMaxPlateCount.min}
+          value={params?.minMaxPlateCount?.min}
           style={styles.textInputHalfStyle}
         />
         <TextInput

@@ -60,5 +60,15 @@ export default StyleSheet.create({
   textItem: {
     flex: 1,
     fontSize: 16
+  },
+  editButton: {
+    width: 60,
+    height: 30,
+    borderRadius: 20,
+    backgroundColor: BaseColor.primaryColor,
+    position: "absolute",
+    right: 20,
+    justifyContent: "center",
+    alignItems: "center"
   }
 });

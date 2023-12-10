@@ -17,6 +17,12 @@ import { Dropdown } from "react-native-element-dropdown";
 const ServiceList = ({ navigation }) => {
   const [currentServiceType, setCurrentServiceType] = useState("Food");
   const [serviceList, setServiceList] = useState(null);
+  const [maxPageReached, setMaxPageReached] = useState(false);
+  const [updatingListing, setUpdatingListing] = useState(false);
+  const [
+    onEndReachedCalledDuringMomentum,
+    setOnEndReachedCalledDuringMomentum
+  ] = useState(true);
   const [pagination, setPagination] = useState({
     pagination: { pageNum: 0, docPerPage: 10 }
   });
@@ -65,10 +71,12 @@ const ServiceList = ({ navigation }) => {
   }, [currentServiceType]);
 
   useEffect(() => {
-    if (serviceList !== null) updateListing();
+    console.log("paginationXXXX", pagination?.pagination?.pageNum);
+    if (serviceList !== null && updatingListing == false) updateListing();
   }, [pagination]);
 
   const call_API = () => {
+    console.log("GATE 3");
     Services.getServiceList(
       pagination,
       API_SERVICE_TYPE,
@@ -79,12 +87,35 @@ const ServiceList = ({ navigation }) => {
   };
 
   const updateListing = () => {
+    console.log("GATE 3X");
     Services.getServiceList(
       pagination,
       API_SERVICE_TYPE,
       (merchantId = authUser?._id)
     ).then((res) => {
+      if (res?.length !== 10) {
+        setMaxPageReached(true);
+      }
       setServiceList([...serviceList, ...res]);
+    });
+  };
+
+  const updateEditedList = (API_SERVICE) => {
+    console.log(pagination, API_SERVICE, "GATE 1");
+    setUpdatingListing(true);
+    setPagination({
+      pagination: { pageNum: 0, docPerPage: 10 }
+    });
+    Services.getServiceList(
+      {
+        pagination: { pageNum: 0, docPerPage: 10 }
+      },
+      API_SERVICE,
+      (merchantId = authUser?._id)
+    ).then((res) => {
+      setServiceList(res);
+      setMaxPageReached(false);
+      setUpdatingListing(false);
     });
   };
 
@@ -138,13 +169,16 @@ const ServiceList = ({ navigation }) => {
         searchPlaceholder="Search..."
         value={currentServiceType}
         onChange={(item) => {
-          setPagination({
-            pagination: {
-              pageNum: 0,
-              docPerPage: 10
-            }
-          });
-          setCurrentServiceType(item.value);
+          if (item.value !== currentServiceType) {
+            setPagination({
+              pagination: {
+                pageNum: 0,
+                docPerPage: 10
+              }
+            });
+            setCurrentServiceType(item.value);
+            setServiceList(null);
+          }
         }}
         renderItem={renderItem}
       />
@@ -153,12 +187,18 @@ const ServiceList = ({ navigation }) => {
         data={serviceList}
         keyExtractor={(item, index) => index + "_" + item}
         onEndReached={() => {
-          setPagination({
-            pagination: {
-              pageNum: pagination.pagination.pageNum + 1,
-              docPerPage: 10
-            }
-          });
+          if (!onEndReachedCalledDuringMomentum && maxPageReached == false) {
+            setPagination({
+              pagination: {
+                pageNum: pagination.pagination.pageNum + 1,
+                docPerPage: 10
+              }
+            });
+          }
+        }}
+        onMomentumScrollBegin={() => {
+          console.log("DOOQG", maxPageReached);
+          setOnEndReachedCalledDuringMomentum(false);
         }}
         renderItem={({ item, index }) => (
           <TouchableOpacity
@@ -171,7 +211,14 @@ const ServiceList = ({ navigation }) => {
               marginTop: 10
             }}
             key={index}
-            onPress={() => {}}
+            onPress={() => {
+              navigation.navigate("AddService", {
+                editParam: item,
+                editFormType: currentServiceType,
+                updateEditedList: updateEditedList,
+                API_SERVICE: API_SERVICE_TYPE
+              });
+            }}
           >
             <View
               style={{
@@ -315,6 +362,9 @@ const ServiceList = ({ navigation }) => {
                   </Text>
                 </View>
               )}
+              <View style={styles.editButton}>
+                <Text style={{ color: "white" }}>Edit</Text>
+              </View>
             </View>
           </TouchableOpacity>
         )}

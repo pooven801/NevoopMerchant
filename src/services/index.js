@@ -80,6 +80,17 @@ export async function getServiceList(pagination, serviceType, merchantId) {
   ).then((data) => data.json());
 }
 
+export async function editService(serviceType, params) {
+  console.log(finalURL + `/service/${serviceType}` + params);
+  return fetch(finalURL + `/service/${serviceType}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(params)
+  }).then((data) => data.json());
+}
+
 export async function searchService(serviceType, params) {
   console.log(finalURL + `/service/${serviceType}`, params);
   return fetch(finalURL + `/service/${serviceType}`, {

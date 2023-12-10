@@ -34,7 +34,7 @@ import { Dropdown } from "react-native-element-dropdown";
 
 // import { useSelector } from "react-redux";
 
-const AddService = ({ navigation }) => {
+const AddService = ({ navigation, route }) => {
   const [params, setParams] = useState();
   const [currentServiceType, setCurrentServiceType] = useState("Food");
   const [checkFormError, setCheckFormError] = useState(false);
@@ -65,49 +65,78 @@ const AddService = ({ navigation }) => {
 
   var API_SERVICE_TYPE = "";
   var deleteServiceType = "";
-  var banServiceType = "";
-  var searchServiceType = "";
-  var updateServiceType = "";
-  var sortServiceType = "";
+  var editServiceType = "";
+
   if (currentServiceType == "Food") {
     API_SERVICE_TYPE = "createFoodService";
+    deleteServiceType = "deleteFoodService";
+    editServiceType = "editFoodService";
   } else if (currentServiceType == "Vanue") {
     API_SERVICE_TYPE = "createVanueService";
+    deleteServiceType = "deleteVanueService";
+    editServiceType = "editVanueService";
   } else if (currentServiceType == "Accommodation") {
     API_SERVICE_TYPE = "createAccommandationService";
+    deleteServiceType = "deleteAccommandationService";
+    editServiceType = "editAccommandationService";
   } else if (currentServiceType == "Transportation/Logistic") {
     API_SERVICE_TYPE = "createTransportationLogisticService";
+    deleteServiceType = "deleteTransportationLogisticService";
+    editServiceType = "editTransportationLogisticService";
   } else if (currentServiceType == "Designer") {
     API_SERVICE_TYPE = "createDesignerService";
+    deleteServiceType = "deleteDesignerService";
+    editServiceType = "editDesignerService";
   } else if (currentServiceType == "Photographer") {
     API_SERVICE_TYPE = "createPhotographerService";
+    deleteServiceType = "deletePhotographerService";
+    editServiceType = "editPhotographerService";
   } else if (currentServiceType == "Video Recorder") {
     API_SERVICE_TYPE = "createVideoRecorderService";
+    deleteServiceType = "deleteVideoRecorderService";
+    editServiceType = "editVideoRecorderService";
   } else if (currentServiceType == "Multimedia") {
     API_SERVICE_TYPE = "createMultimediaService";
+    deleteServiceType = "deleteMultimediaService";
+    editServiceType = "editMultimediaService";
   } else if (currentServiceType == "Decoration") {
     API_SERVICE_TYPE = "createDecorationService";
+    deleteServiceType = "deleteDecorationService";
+    editServiceType = "editDecorationService";
   } else if (currentServiceType == "Beauty & Health") {
     API_SERVICE_TYPE = "createBeautyHealthService";
+    deleteServiceType = "deleteBeautyHealthService";
+    editServiceType = "editBeautyHealthService";
   } else {
     API_SERVICE_TYPE = "createOthersService";
+    deleteServiceType = "deleteOthersService";
+    editServiceType = "editOthersService";
   }
 
   useEffect(() => {
-    GetLocation.getCurrentPosition({
-      enableHighAccuracy: true,
-      timeout: 60000
-    })
-      .then((location) => {
-        setMarkedCoordinate({
-          latitude: location.latitude,
-          longitude: location.longitude
-        });
-      })
-      .catch((error) => {
-        const { code, message } = error;
-        console.warn(code, message);
+    if (route?.params?.editParam != undefined) {
+      setCurrentServiceType(route?.params?.editFormType);
+      setParams(route?.params?.editParam);
+      setMarkedCoordinate({
+        latitude: route?.params?.editParam.locationCoordinate.latitude,
+        longitude: route?.params?.editParam.locationCoordinate.longitude
       });
+    } else {
+      GetLocation.getCurrentPosition({
+        enableHighAccuracy: true,
+        timeout: 60000
+      })
+        .then((location) => {
+          setMarkedCoordinate({
+            latitude: location.latitude,
+            longitude: location.longitude
+          });
+        })
+        .catch((error) => {
+          const { code, message } = error;
+          console.warn(code, message);
+        });
+    }
   }, []);
 
   const locationCallback = (res) => {
@@ -123,20 +152,38 @@ const AddService = ({ navigation }) => {
   };
 
   const submitForm = () => {
-    Services.createServices(params, API_SERVICE_TYPE).then((res) => {
-      if (res?.success) {
-        setShowSubmitStatusModal({
-          show: true,
-          message: res.message
-        });
-      } else {
-        setServerError(true);
-        setShowSubmitStatusModal({
-          show: true,
-          message: res.message
-        });
-      }
-    });
+    if (route?.params?.editParam != undefined) {
+      console.log(params, "XXXTESTXXX");
+      Services.editService(editServiceType, params).then((res) => {
+        if (res?.success) {
+          setShowSubmitStatusModal({
+            show: true,
+            message: res.message
+          });
+        } else {
+          setServerError(true);
+          setShowSubmitStatusModal({
+            show: true,
+            message: res.message2
+          });
+        }
+      });
+    } else {
+      Services.createServices(params, API_SERVICE_TYPE).then((res) => {
+        if (res?.success) {
+          setShowSubmitStatusModal({
+            show: true,
+            message: res.message
+          });
+        } else {
+          setServerError(true);
+          setShowSubmitStatusModal({
+            show: true,
+            message: res.message
+          });
+        }
+      });
+    }
   };
 
   return (
@@ -177,30 +224,32 @@ const AddService = ({ navigation }) => {
                 Platform.OS === "ios" && { fontSize: 14 }
               ]}
             >
-              Submit
+              {route?.params?.editParam == undefined ? "Submit" : "Edit"}
             </Text>
           );
         }}
       />
       <ScrollView>
-        <Dropdown
-          style={styles.dropdownMain}
-          placeholderStyle={styles.placeholderStyle}
-          selectedTextStyle={styles.selectedTextStyle}
-          inputSearchStyle={styles.inputSearchStyle}
-          iconStyle={styles.iconStyle}
-          data={serviceItem}
-          maxHeight={300}
-          labelField="label"
-          valueField="value"
-          placeholder="Select"
-          searchPlaceholder="Search..."
-          value={currentServiceType}
-          onChange={(item) => {
-            setCurrentServiceType(item.value);
-          }}
-          renderItem={renderItem}
-        />
+        {route?.params?.editParam == undefined && (
+          <Dropdown
+            style={styles.dropdownMain}
+            placeholderStyle={styles.placeholderStyle}
+            selectedTextStyle={styles.selectedTextStyle}
+            inputSearchStyle={styles.inputSearchStyle}
+            iconStyle={styles.iconStyle}
+            data={serviceItem}
+            maxHeight={300}
+            labelField="label"
+            valueField="value"
+            placeholder="Select"
+            searchPlaceholder="Search..."
+            value={currentServiceType}
+            onChange={(item) => {
+              setCurrentServiceType(item.value);
+            }}
+            renderItem={renderItem}
+          />
+        )}
         {currentServiceType == "Food" && (
           <FoodForm
             location={markedCoordinate}
@@ -211,9 +260,9 @@ const AddService = ({ navigation }) => {
               });
             }}
             updateParams={(res) => {
-              console.log(res);
               setParams(res);
             }}
+            editParams={route?.params?.editParam ?? null}
             checkFormError={checkFormError}
             submitForm={submitForm}
           />
@@ -228,11 +277,11 @@ const AddService = ({ navigation }) => {
               });
             }}
             updateParams={(res) => {
-              console.log(res);
               setParams(res);
             }}
             checkFormError={checkFormError}
             submitForm={submitForm}
+            editParams={route?.params?.editParam ?? null}
           />
         )}
         {currentServiceType == "Vanue" && (
@@ -245,10 +294,10 @@ const AddService = ({ navigation }) => {
               });
             }}
             updateParams={(res) => {
-              console.log(res);
               setParams(res);
             }}
             checkFormError={checkFormError}
+            editParams={route?.params?.editParam ?? null}
             submitForm={submitForm}
           />
         )}
@@ -262,11 +311,11 @@ const AddService = ({ navigation }) => {
               });
             }}
             updateParams={(res) => {
-              console.log(res);
               setParams(res);
             }}
             checkFormError={checkFormError}
             submitForm={submitForm}
+            editParams={route?.params?.editParam ?? null}
           />
         )}
         {currentServiceType == "Photographer" && (
@@ -279,11 +328,11 @@ const AddService = ({ navigation }) => {
               });
             }}
             updateParams={(res) => {
-              console.log(res);
               setParams(res);
             }}
             checkFormError={checkFormError}
             submitForm={submitForm}
+            editParams={route?.params?.editParam ?? null}
           />
         )}
         {currentServiceType == "Transportation/Logistic" && (
@@ -296,11 +345,11 @@ const AddService = ({ navigation }) => {
               });
             }}
             updateParams={(res) => {
-              console.log(res);
               setParams(res);
             }}
             checkFormError={checkFormError}
             submitForm={submitForm}
+            editParams={route?.params?.editParam ?? null}
           />
         )}
         {currentServiceType == "Decoration" && (
@@ -313,11 +362,11 @@ const AddService = ({ navigation }) => {
               });
             }}
             updateParams={(res) => {
-              console.log(res);
               setParams(res);
             }}
             checkFormError={checkFormError}
             submitForm={submitForm}
+            editParams={route?.params?.editParam ?? null}
           />
         )}
         {currentServiceType == "Designer" && (
@@ -330,11 +379,11 @@ const AddService = ({ navigation }) => {
               });
             }}
             updateParams={(res) => {
-              console.log(res);
               setParams(res);
             }}
             checkFormError={checkFormError}
             submitForm={submitForm}
+            editParams={route?.params?.editParam ?? null}
           />
         )}
         {currentServiceType == "Multimedia" && (
@@ -347,11 +396,11 @@ const AddService = ({ navigation }) => {
               });
             }}
             updateParams={(res) => {
-              console.log(res);
               setParams(res);
             }}
             checkFormError={checkFormError}
             submitForm={submitForm}
+            editParams={route?.params?.editParam ?? null}
           />
         )}
         {currentServiceType == "Video Recorder" && (
@@ -364,9 +413,9 @@ const AddService = ({ navigation }) => {
               });
             }}
             updateParams={(res) => {
-              console.log(res);
               setParams(res);
             }}
+            editParams={route?.params?.editParam == undefined ? null : params}
             checkFormError={checkFormError}
             submitForm={submitForm}
           />
@@ -381,11 +430,11 @@ const AddService = ({ navigation }) => {
               });
             }}
             updateParams={(res) => {
-              console.log(res);
               setParams(res);
             }}
             checkFormError={checkFormError}
             submitForm={submitForm}
+            editParams={route?.params?.editParam ?? null}
           />
         )}
         <CustomModal
@@ -413,7 +462,12 @@ const AddService = ({ navigation }) => {
                   setServerError(false);
                   return;
                 }
-                navigation.navigate("Home");
+                if (route?.params?.editParam != undefined) {
+                  route.params.updateEditedList(route?.params?.API_SERVICE);
+                  navigation.goBack();
+                } else {
+                  navigation.navigate("Home");
+                }
               }}
             >
               <Text style={styles.summitText}>OK</Text>
